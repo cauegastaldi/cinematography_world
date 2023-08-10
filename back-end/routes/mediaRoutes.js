@@ -56,7 +56,6 @@ router.post(
 		.withMessage("Ano de lançamento não pode ser negativo!")
 		.custom((releaseYear) => releaseYear.toString().length == 4)
 		.withMessage("Ano de lançamento deve possuir 4 digitos"),
-
 	check("director")
 		.exists()
 		.withMessage("Diretor não pode ser nulo!")

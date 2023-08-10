@@ -3,8 +3,6 @@ import { urlencoded, json } from "body-parser";
 import db from "./database/db";
 import dotenv from "dotenv";
 import cors from "cors";
-import media from "./app/modules/CinematographyMedia";
-import user from "./app/modules/User";
 
 import mediaRoutes from "./routes/mediaRoutes";
 import reviewRoutes from "./routes/reviewRoutes";
@@ -23,7 +21,7 @@ async function start() {
 	app.use(cors());
 
 	app.use("/medias", mediaRoutes);
-	app.use("/reviews,", reviewRoutes);
+	app.use("/reviews", reviewRoutes);
 	app.use("/users", userRoutes);
 
 	app.listen(port, function () {
