@@ -14,7 +14,7 @@ const Review = db.define("review", {
 		allowNull: false,
 	},
 	mediaScore: {
-		type: Sequelize.INTEGER,
+		type: Sequelize.DOUBLE,
 		allowNull: false,
 	},
 });

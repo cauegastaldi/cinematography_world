@@ -23,7 +23,17 @@ router.get(
 		const result = validationResult(req).formatWith(errorsFormatter);
 		try {
 			result.throw();
-			await reviewController.findReviewById(req, res);
+
+			const review = await reviewController.findReviewById(req.params.id);
+
+			if (review == null) {
+				return res.status(400).json({
+					errorCode: "ERRO_ANALISE_NAO_ENCONTRADA",
+					errorData: `Análise não encontrada! Por favor, informe uma análise existente.`,
+				});
+			}
+
+			res.status(200).json(review);
 		} catch (error) {
 			res.status(400).json({
 				codigoErro: "ERRO_CAMPOS_INVALIDOS",
@@ -47,10 +57,8 @@ router.post(
 		.trim()
 		.notEmpty()
 		.withMessage("Nota não pode ser vazia!")
-		.isInt()
-		.withMessage("Nota deve ser um número inteiro!")
-		.custom((id) => id > 0)
-		.withMessage("Nota não pode ser negativa!"),
+		.isFloat({ min: 0, max: 5 })
+		.withMessage("Nota deve ser um número entre 0 e 5!"),
 	check("mediaId")
 		.exists()
 		.withMessage("Id da mídia não pode ser nulo!")
@@ -71,6 +79,53 @@ router.post(
 		try {
 			result.throw();
 			reviewController.addReview(req, res);
+		} catch (error) {
+			res.status(400).json({
+				codigoErro: "ERRO_CAMPOS_INVALIDOS",
+				dadosErro: error.mapped(),
+			});
+		}
+	}
+);
+
+router.put(
+	"/:id",
+	check("comment").optional().trim().notEmpty().withMessage("Comentário não pode ser vazio!"),
+	check("mediaScore")
+		.optional()
+		.isInt()
+		.withMessage("Nota deve ser um número inteiro!")
+		.custom((id) => id > 0)
+		.withMessage("Nota não pode ser negativa!"),
+
+	async (req, res) => {
+		const result = validationResult(req).formatWith(errorsFormatter);
+		try {
+			result.throw();
+			reviewController.updateReview(req, res);
+		} catch (error) {
+			res.status(400).json({
+				codigoErro: "ERRO_CAMPOS_INVALIDOS",
+				dadosErro: error.mapped(),
+			});
+		}
+	}
+);
+
+router.delete(
+	"/:id",
+	check("id")
+		.exists()
+		.withMessage("ID não pode ser nulo!")
+		.isInt()
+		.withMessage("ID deve ser um número inteiro!")
+		.custom((id) => id > 0)
+		.withMessage("ID não pode ser negativo!"),
+	async (req, res) => {
+		const result = validationResult(req).formatWith(errorsFormatter);
+		try {
+			result.throw();
+			reviewController.deleteReview(req, res);
 		} catch (error) {
 			res.status(400).json({
 				codigoErro: "ERRO_CAMPOS_INVALIDOS",

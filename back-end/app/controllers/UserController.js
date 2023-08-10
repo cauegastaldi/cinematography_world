@@ -1,43 +1,65 @@
 import User from "../modules/User";
+import bcryptjs from "bcryptjs";
+import passwordUtils from "../utils/User/passwordUtils";
 
 function findAll(req, res) {
 	User.findAll().then((result) => res.json(result));
 }
 
-async function findUserById(req, res) {
+async function findUserById(id) {
+	return await User.findByPk(id);
+}
+
+async function addUser(req, res) {
+	const username = req.body.username;
+	const userType = req.body.userType;
+	const uniqueUsername = await usernameIsUnique(username);
+	if (!uniqueUsername) {
+		return res.status(400).json({
+			errorCode: "ERRO_USERNAME_EXISTENTE",
+			errorData:
+				"O nome de usuário escolhido já existe! Por favor, informe um novo nome de usuário",
+		});
+	}
+
+	const password = await passwordUtils.hashPassword(req.body.password);
+
+	User.create({
+		username: username,
+		password: password,
+		userType: userType,
+	}).then((result) => res.status(200).json(result));
+}
+
+async function updateUser(req, res) {
 	const user = await User.findByPk(req.params.id);
 
 	if (user == null) {
 		return res.status(400).json({
 			errorCode: "ERRO_USUARIO_NAO_ENCONTRADO",
-			errorData: `Usuário de id = ${req.params.id} não encontrado! Por favor, informe um usuário existente.`,
+			errorData: "Usuário não encontrado! Por favor, informe um usuário existente.",
 		});
 	}
 
-	res.status(200).json(user);
-}
+	const username = req.body.username;
+	let password = req.body.password;
 
-function addUser(user, res) {
-	User.create({
-		username: user.username,
-		password: user.password,
-		userType: user.userType,
-	}).then((result) => res.status(200).json(result));
-}
-
-async function updateUser(user, res) {
-	await User.update(
-		{
-			username: user.username,
-			password: user.password,
-			userType: user.userType,
-		},
-		{
-			where: {
-				id: req.params.id,
-			},
+	if (username != null) {
+		const uniqueUsername = await usernameIsUnique(username);
+		if (!uniqueUsername) {
+			return res.status(400).json({
+				errorCode: "ERRO_USERNAME_EXISTENTE",
+				errorData:
+					"O nome de usuário escolhido já existe! Por favor, informe um novo nome de usuário",
+			});
 		}
-	);
+		user.username = username;
+	}
+	if (password != null) {
+		user.password = await passwordUtils.hashPassword(req.body.password);
+	}
+
+	await user.save();
 
 	return res.status(200).send({ msg: `Usuário atualizado com sucesso!` });
 }
@@ -48,13 +70,23 @@ async function deleteUser(req, res) {
 	if (user == null) {
 		return res.status(400).json({
 			errorCode: "ERRO_USUARIO_NAO_ENCONTRADO",
-			errorData: `Usuário de id = ${req.params.id} não encontrado! Por favor, informe um usuário existente.`,
+			errorData: `Usuário não encontrado! Por favor, informe um usuário existente.`,
 		});
 	}
 
 	await user.destroy();
 
 	return res.status(200).send({ msg: "Usuário deletado com sucesso!" });
+}
+
+async function usernameIsUnique(username) {
+	const user = await User.findOne({
+		where: {
+			username: username,
+		},
+	});
+
+	return user == null;
 }
 
 export default { findAll, findUserById, addUser, updateUser, deleteUser };

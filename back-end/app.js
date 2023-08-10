@@ -7,6 +7,7 @@ import cors from "cors";
 import mediaRoutes from "./routes/mediaRoutes";
 import reviewRoutes from "./routes/reviewRoutes";
 import userRoutes from "./routes/userRoutes";
+import uploadRoute from "./routes/uploadRoute";
 
 const port = 8000;
 const app = express();
@@ -23,6 +24,8 @@ async function start() {
 	app.use("/medias", mediaRoutes);
 	app.use("/reviews", reviewRoutes);
 	app.use("/users", userRoutes);
+	app.use("/upload", uploadRoute);
+	app.use(express.static("public"));
 
 	app.listen(port, function () {
 		console.log(`servidor operando na porta ${port}`);

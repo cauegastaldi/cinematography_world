@@ -23,7 +23,16 @@ router.get(
 		const result = validationResult(req).formatWith(errorsFormatter);
 		try {
 			result.throw();
-			await mediaController.findMediaById(req, res);
+
+			const media = await mediaController.findMediaById(req.params.id);
+
+			if (media == null) {
+				return res.status(400).json({
+					errorCode: "ERRO_MIDIA_NAO_ENCONTRADA",
+					errorData: `Mídia não encontrada! Por favor, informe uma mídia existente.`,
+				});
+			}
+			res.status(200).json(media);
 		} catch (error) {
 			res.status(400).json({
 				codigoErro: "ERRO_CAMPOS_INVALIDOS",
@@ -67,6 +76,63 @@ router.post(
 		try {
 			result.throw();
 			mediaController.addMedia(req, res);
+		} catch (error) {
+			res.status(400).json({
+				codigoErro: "ERRO_CAMPOS_INVALIDOS",
+				dadosErro: error.mapped(),
+			});
+		}
+	}
+);
+
+router.put(
+	"/:id",
+	check("id")
+		.exists()
+		.withMessage("ID não pode ser nulo!")
+		.isInt()
+		.withMessage("ID deve ser um número inteiro!")
+		.custom((id) => id > 0)
+		.withMessage("ID não pode ser negativo!"),
+	check("name").optional().trim().notEmpty().withMessage("Nome não pode ser vazio!"),
+	check("genre").optional().trim().notEmpty().withMessage("Gênero não pode ser vazio!"),
+	check("releaseYear")
+		.optional()
+		.isInt()
+		.withMessage("Ano de lançamento deve ser um número inteiro!")
+		.custom((releaseYear) => releaseYear > 0)
+		.withMessage("Ano de lançamento não pode ser negativo!")
+		.custom((releaseYear) => releaseYear.toString().length == 4)
+		.withMessage("Ano de lançamento deve possuir 4 digitos"),
+	check("director").optional().trim().notEmpty().withMessage("Diretor não pode ser vazio!"),
+	async (req, res) => {
+		const result = validationResult(req).formatWith(errorsFormatter);
+		try {
+			result.throw();
+			mediaController.updateMedia(req, res);
+		} catch (error) {
+			res.status(400).json({
+				codigoErro: "ERRO_CAMPOS_INVALIDOS",
+				dadosErro: error.mapped(),
+			});
+		}
+	}
+);
+
+router.delete(
+	"/:id",
+	check("id")
+		.exists()
+		.withMessage("ID não pode ser nulo!")
+		.isInt()
+		.withMessage("ID deve ser um número inteiro!")
+		.custom((id) => id > 0)
+		.withMessage("ID não pode ser negativo!"),
+	async (req, res) => {
+		const result = validationResult(req).formatWith(errorsFormatter);
+		try {
+			result.throw();
+			mediaController.deleteMedia(req, res);
 		} catch (error) {
 			res.status(400).json({
 				codigoErro: "ERRO_CAMPOS_INVALIDOS",

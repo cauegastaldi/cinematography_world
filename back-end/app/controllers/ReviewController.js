@@ -6,24 +6,15 @@ function findAll(req, res) {
 	Review.findAll().then((result) => res.json(result));
 }
 
-async function findReviewById(req, res) {
-	const review = await Review.findByPk(req.params.id);
-
-	if (review == null) {
-		return res.status(400).json({
-			errorCode: "ERRO_ANALISE_NAO_ENCONTRADA",
-			errorData: `Análise de id = ${req.params.id} não encontrada! Por favor, informe uma análise existente.`,
-		});
-	}
-
-	res.status(200).json(review);
+async function findReviewById(id) {
+	return await Review.findByPk(id);
 }
 
 async function addReview(req, res) {
 	const mediaId = req.body.mediaId;
 	const userId = req.body.userId;
-	const media = CinematographyMediaController.findMediaById(mediaId);
-	const user = UserController.findUserById(userId);
+	const media = await CinematographyMediaController.findMediaById(mediaId);
+	const user = await UserController.findUserById(userId);
 
 	if (media == null && user == null) {
 		return res.status(400).json({
@@ -32,7 +23,7 @@ async function addReview(req, res) {
 		});
 	} else if (media == null && user != null) {
 		return res.status(400).json({
-			codigoErro: "ERRO_MIDIA_E_USUARIO_NAO_EXISTENTES",
+			codigoErro: "ERRO_MIDIA_NAO_EXISTENTE",
 			dadosErro: `Mídia não existente! Por favor, informe uma mídia existente.`,
 		});
 	} else if (user == null) {
@@ -52,17 +43,22 @@ async function addReview(req, res) {
 }
 
 async function updateReview(req, res) {
-	await Review.update(
-		{
-			comment: req.body.comment,
-			mediaScore: req.body.mediaScore,
-		},
-		{
-			where: {
-				id: req.params.id,
-			},
-		}
-	);
+	const review = await Review.findByPk(req.params.id);
+
+	if (review == null) {
+		return res.status(400).json({
+			errorCode: "ERRO_ANALISE_NAO_ENCONTRADA",
+			errorData: `Análise de id = ${req.params.id} não encontrada! Por favor, informe uma análise existente.`,
+		});
+	}
+
+	const comment = req.body.comment;
+	const mediaScore = req.body.mediaScore;
+
+	if (comment != null) review.comment = comment;
+	if (mediaScore != null) review.mediaScore = mediaScore;
+
+	await review.save();
 
 	return res.status(200).send({ msg: `Análise atualizada com sucesso!` });
 }
@@ -73,7 +69,7 @@ async function deleteReview(req, res) {
 	if (review == null) {
 		return res.status(400).json({
 			errorCode: "ERRO_ANALISE_NAO_ENCONTRADA",
-			errorData: `Análise de id = ${id} não encontrada! Por favor, informe uma análise existente.`,
+			errorData: `Análise de id = ${req.params.id} não encontrada! Por favor, informe uma análise existente.`,
 		});
 	}
 
