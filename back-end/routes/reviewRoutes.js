@@ -1,6 +1,7 @@
 import express from "express";
 import reviewController from "../app/controllers/ReviewController";
 import { check, validationResult } from "express-validator";
+import verifyToken from "../app/middlewares/verifyToken";
 
 const errorsFormatter = ({ msg }) => {
 	return `${msg}`;
@@ -45,6 +46,7 @@ router.get(
 
 router.post(
 	"/",
+	verifyToken,
 	check("comment")
 		.exists()
 		.withMessage("Comentário não pode ser nulo!")
@@ -90,13 +92,15 @@ router.post(
 
 router.put(
 	"/:id",
+	verifyToken,
 	check("comment").optional().trim().notEmpty().withMessage("Comentário não pode ser vazio!"),
 	check("mediaScore")
 		.optional()
-		.isInt()
-		.withMessage("Nota deve ser um número inteiro!")
-		.custom((id) => id > 0)
-		.withMessage("Nota não pode ser negativa!"),
+		.trim()
+		.notEmpty()
+		.withMessage("Nota não pode ser vazia!")
+		.isFloat({ min: 0, max: 5 })
+		.withMessage("Nota deve ser um número entre 0 e 5!"),
 
 	async (req, res) => {
 		const result = validationResult(req).formatWith(errorsFormatter);
@@ -114,6 +118,7 @@ router.put(
 
 router.delete(
 	"/:id",
+	verifyToken,
 	check("id")
 		.exists()
 		.withMessage("ID não pode ser nulo!")

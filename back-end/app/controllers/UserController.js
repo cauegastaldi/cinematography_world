@@ -10,9 +10,25 @@ async function findUserById(id) {
 	return await User.findByPk(id);
 }
 
+async function findUserByUsername(username) {
+	return await User.findOne({
+		where: {
+			username: username,
+		},
+	});
+}
+
 async function addUser(req, res) {
 	const username = req.body.username;
 	const userType = req.body.userType;
+
+	if (userType == "ADMIN" && req.userType != "ADMIN") {
+		return res.status(401).json({
+			errorCode: "ERRO_USUARIO_NAO_AUTORIZADO",
+			errorData: `Somente usuários administradores podem adicionar outros administradores.`,
+		});
+	}
+
 	const uniqueUsername = await usernameIsUnique(username);
 	if (!uniqueUsername) {
 		return res.status(400).json({
@@ -74,6 +90,13 @@ async function deleteUser(req, res) {
 		});
 	}
 
+	if (req.userType != "ADMIN" && req.userId != user.id) {
+		return res.status(401).json({
+			errorCode: "ERRO_USUARIO_NAO_AUTORIZADO",
+			errorData: `Somente usuários administradores ou o dono da conta podem remover esse usuário.`,
+		});
+	}
+
 	await user.destroy();
 
 	return res.status(200).send({ msg: "Usuário deletado com sucesso!" });
@@ -89,4 +112,4 @@ async function usernameIsUnique(username) {
 	return user == null;
 }
 
-export default { findAll, findUserById, addUser, updateUser, deleteUser };
+export default { findAll, findUserById, findUserByUsername, addUser, updateUser, deleteUser };

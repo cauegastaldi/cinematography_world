@@ -9,6 +9,13 @@ async function findMediaById(id) {
 }
 
 function addMedia(req, res) {
+	if (req.userType != "ADMIN") {
+		return res.status(401).json({
+			errorCode: "ERRO_USUARIO_NAO_AUTORIZADO",
+			errorData: `Somente usuários administradores podem adicionar mídias.`,
+		});
+	}
+
 	Media.create({
 		name: req.body.name,
 		releaseYear: req.body.releaseYear,
@@ -18,6 +25,13 @@ function addMedia(req, res) {
 }
 
 async function updateMedia(req, res) {
+	if (req.userType != "ADMIN") {
+		return res.status(401).json({
+			errorCode: "ERRO_USUARIO_NAO_AUTORIZADO",
+			errorData: `Somente usuários administradores podem editar mídias.`,
+		});
+	}
+
 	const media = await Media.findByPk(req.params.id);
 
 	if (media == null) {
@@ -46,6 +60,13 @@ async function updateMedia(req, res) {
 }
 
 async function deleteMedia(req, res) {
+	if (req.userType != "ADMIN") {
+		return res.status(401).json({
+			errorCode: "ERRO_USUARIO_NAO_AUTORIZADO",
+			errorData: `Somente usuários administradores podem remover mídias.`,
+		});
+	}
+
 	const media = await Media.findByPk(req.params.id);
 
 	if (media == null) {

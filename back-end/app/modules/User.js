@@ -21,6 +21,12 @@ const User = db.define("user", {
 	userType: {
 		type: Sequelize.STRING,
 		allowNull: false,
+		validate: {
+			isIn: {
+				args: [["ADMIN", "NORMAL"]],
+				msg: "Tipo de usuário deve ser 'ADMIN' ou 'NORMAL'",
+			},
+		},
 	},
 });
 

@@ -1,6 +1,7 @@
 import express from "express";
 import mediaController from "../app/controllers/CinematographyMediaController";
 import { check, validationResult } from "express-validator";
+import verifyToken from "../app/middlewares/verifyToken";
 
 const errorsFormatter = ({ msg }) => {
 	return `${msg}`;
@@ -44,6 +45,7 @@ router.get(
 
 router.post(
 	"/",
+	verifyToken,
 	check("name")
 		.exists()
 		.withMessage("Nome não pode ser nulo!")
@@ -87,6 +89,7 @@ router.post(
 
 router.put(
 	"/:id",
+	verifyToken,
 	check("id")
 		.exists()
 		.withMessage("ID não pode ser nulo!")
@@ -121,6 +124,7 @@ router.put(
 
 router.delete(
 	"/:id",
+	verifyToken,
 	check("id")
 		.exists()
 		.withMessage("ID não pode ser nulo!")

@@ -1,6 +1,7 @@
 import express from "express";
 import userController from "../app/controllers/UserController";
 import { check, validationResult } from "express-validator";
+import verifyToken from "../app/middlewares/verifyToken";
 
 const errorsFormatter = ({ msg }) => {
 	return `${msg}`;
@@ -44,7 +45,8 @@ router.get(
 );
 
 router.post(
-	"/",
+	"/registerAdmin",
+	verifyToken,
 	check("username")
 		.exists()
 		.withMessage("Usuário não pode ser nulo!")
@@ -57,22 +59,41 @@ router.post(
 		.trim()
 		.notEmpty()
 		.withMessage("Senha não pode ser vazia!"),
-	check("userType")
-		.exists()
-		.withMessage("Tipo de usuário não pode ser nulo!")
-		.trim()
-		.notEmpty()
-		.withMessage("Tipo de usuário não pode ser vazia!")
-		.isIn(["ADMIN", "NORMAL"])
-		.withMessage("Tipo de usuário precisa ser 'ADMIN' ou 'NORMAL'"),
 	async (req, res) => {
 		const result = validationResult(req).formatWith(errorsFormatter);
 		try {
 			result.throw();
-			const username = req.body.username;
-			const password = req.body.password;
-			const userType = req.body.userType;
-			const user = { username: username, password: password, userType: userType };
+			req.body.userType = "ADMIN";
+			userController.addUser(req, res);
+		} catch (error) {
+			res.status(400).json({
+				codigoErro: "ERRO_CAMPOS_INVALIDOS",
+				dadosErro: error.mapped(),
+			});
+		}
+	}
+);
+
+router.post(
+	"/registerUser",
+	check("username")
+		.exists()
+		.withMessage("Usuário não pode ser nulo!")
+		.trim()
+		.notEmpty()
+		.withMessage("Usuário não pode ser vazio!"),
+	check("password")
+		.exists()
+		.withMessage("Senha não pode ser nula!")
+		.trim()
+		.notEmpty()
+		.withMessage("Senha não pode ser vazia!"),
+
+	async (req, res) => {
+		const result = validationResult(req).formatWith(errorsFormatter);
+		try {
+			result.throw();
+			req.body.userType = "NORMAL";
 			userController.addUser(req, res);
 		} catch (error) {
 			res.status(400).json({
@@ -85,6 +106,7 @@ router.post(
 
 router.put(
 	"/:id",
+	verifyToken,
 	check("username")
 		.optional()
 		.trim()
@@ -109,6 +131,7 @@ router.put(
 
 router.delete(
 	"/:id",
+	verifyToken,
 	check("id")
 		.exists()
 		.withMessage("ID não pode ser nulo!")

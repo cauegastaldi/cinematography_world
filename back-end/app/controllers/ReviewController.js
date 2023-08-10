@@ -19,7 +19,7 @@ async function addReview(req, res) {
 	if (media == null && user == null) {
 		return res.status(400).json({
 			codigoErro: "ERRO_MIDIA_E_USUARIO_NAO_EXISTENTES",
-			dadosErro: `Mídia e usuários não existentes! Por favor, informe uma mídia e usuário existentes.`,
+			dadosErro: `Mídia e usuário não existentes! Por favor, informe uma mídia e usuário existentes.`,
 		});
 	} else if (media == null && user != null) {
 		return res.status(400).json({
@@ -49,6 +49,13 @@ async function updateReview(req, res) {
 		return res.status(400).json({
 			errorCode: "ERRO_ANALISE_NAO_ENCONTRADA",
 			errorData: `Análise de id = ${req.params.id} não encontrada! Por favor, informe uma análise existente.`,
+		});
+	}
+
+	if (req.userId != review.userId) {
+		return res.status(400).json({
+			errorCode: "ERRO_USUARIO_NAO_AUTORIZADO",
+			errorData: `Esta análise pertence a outro usuário!`,
 		});
 	}
 
