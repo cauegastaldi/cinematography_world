@@ -33,9 +33,12 @@ async function addReview(req, res) {
 		});
 	}
 
+	const publishDate = new Date().toLocaleDateString("pt-br");
+
 	const review = await Review.create({
 		comment: req.body.comment,
 		mediaScore: req.body.mediaScore,
+		publishDate: publishDate,
 	});
 	review.setMedia(media);
 	review.setUser(user);

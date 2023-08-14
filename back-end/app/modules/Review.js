@@ -17,6 +17,10 @@ const Review = db.define("review", {
 		type: Sequelize.DOUBLE,
 		allowNull: false,
 	},
+	publishDate: {
+		type: Sequelize.STRING,
+		allowNull: false,
+	},
 });
 
 export default Review;
