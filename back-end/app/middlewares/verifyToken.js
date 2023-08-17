@@ -3,7 +3,9 @@ import fs from "fs";
 import { resolve } from "path";
 
 export default function verifyToken(req, res, next) {
-	const token = req.headers["x-access-token"];
+	//const token = req.headers["x-access-token"];
+
+	const token = req.cookies?.token;
 
 	if (!token) return res.status(401).json({ auth: false, msg: "Token não informado" });
 

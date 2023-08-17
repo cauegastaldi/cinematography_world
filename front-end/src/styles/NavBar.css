@@ -1,0 +1,16 @@
+.link:hover {
+	color: white;
+}
+
+.link {
+	color: #d0d6de;
+	font-size: 0.95em;
+}
+
+.navbar {
+	background-color: #18181b;
+}
+
+.active {
+	color: #f8f8f8 !important;
+}

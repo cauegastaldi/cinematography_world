@@ -18,18 +18,18 @@ async function addReview(req, res) {
 
 	if (media == null && user == null) {
 		return res.status(400).json({
-			codigoErro: "ERRO_MIDIA_E_USUARIO_NAO_EXISTENTES",
-			dadosErro: `Mídia e usuário não existentes! Por favor, informe uma mídia e usuário existentes.`,
+			errorCode: "ERRO_MIDIA_E_USUARIO_NAO_EXISTENTES",
+			errorData: `Mídia e usuário não existentes! Por favor, informe uma mídia e usuário existentes.`,
 		});
 	} else if (media == null && user != null) {
 		return res.status(400).json({
-			codigoErro: "ERRO_MIDIA_NAO_EXISTENTE",
-			dadosErro: `Mídia não existente! Por favor, informe uma mídia existente.`,
+			errorCode: "ERRO_MIDIA_NAO_EXISTENTE",
+			errorData: `Mídia não existente! Por favor, informe uma mídia existente.`,
 		});
 	} else if (user == null) {
 		return res.status(400).json({
-			codigoErro: "ERRO_USUARIO_NAO_EXISTENTE",
-			dadosErro: `Usuário não existente! Por favor, informe um usuário existente.`,
+			errorCode: "ERRO_USUARIO_NAO_EXISTENTE",
+			errorData: `Usuário não existente! Por favor, informe um usuário existente.`,
 		});
 	}
 

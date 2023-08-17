@@ -1,5 +1,4 @@
 import User from "../modules/User";
-import bcryptjs from "bcryptjs";
 import passwordUtils from "../utils/User/passwordUtils";
 
 function findAll(req, res) {
@@ -23,7 +22,7 @@ async function addUser(req, res) {
 	const userType = req.body.userType;
 
 	if (userType == "ADMIN" && req.userType != "ADMIN") {
-		return res.status(401).json({
+		return res.status(403).json({
 			errorCode: "ERRO_USUARIO_NAO_AUTORIZADO",
 			errorData: `Somente usuários administradores podem adicionar outros administradores.`,
 		});

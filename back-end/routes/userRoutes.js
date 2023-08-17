@@ -122,8 +122,8 @@ router.put(
 			userController.updateUser(req, res);
 		} catch (error) {
 			res.status(400).json({
-				codigoErro: "ERRO_CAMPOS_INVALIDOS",
-				dadosErro: error.mapped(),
+				errorCode: "ERRO_CAMPOS_INVALIDOS",
+				errorData: error.mapped(),
 			});
 		}
 	}

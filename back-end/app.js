@@ -3,6 +3,7 @@ import { urlencoded, json } from "body-parser";
 import db from "./database/db";
 import dotenv from "dotenv";
 import cors from "cors";
+import cookies from "cookie-parser";
 
 import mediaRoutes from "./routes/mediaRoutes";
 import reviewRoutes from "./routes/reviewRoutes";
@@ -16,11 +17,17 @@ const app = express();
 async function start() {
 	dotenv.config();
 
-	await db.sync({ force: true });
+	await db.sync();
 
 	app.use(urlencoded({ extended: true }));
 	app.use(json());
-	app.use(cors());
+	const corsOptions = {
+		origin: "http://localhost:3000",
+		credentials: true,
+		optionSuccessStatus: 200,
+	};
+	app.use(cors(corsOptions));
+	app.use(cookies());
 
 	app.use("/medias", mediaRoutes);
 	app.use("/reviews", reviewRoutes);

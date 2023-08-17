@@ -18,8 +18,8 @@ async function login(req, res) {
 
 	if (!(await credentialsMatch(username, password))) {
 		return res.status(400).json({
-			codigoErro: "ERRO_CREDENCIAIS_INVALIDAS",
-			dadosErro: `Usuário ou senha incorretos!`,
+			errorCode: "ERRO_CREDENCIAIS_INVALIDAS",
+			errorData: `Usuário ou senha incorretos!`,
 		});
 	}
 
@@ -31,7 +31,12 @@ async function login(req, res) {
 		algorithm: "RS256",
 	});
 
-	res.status(200).json({ auth: true, token: token });
+	//res.status(200).json({ auth: true, token: token });
+	res.cookie("token", token, {
+		secure: false,
+		httpOnly: true,
+	});
+	res.status(200).json({ userId: user.id, username: user.username, userType: user.userType });
 }
 
 export default { login };

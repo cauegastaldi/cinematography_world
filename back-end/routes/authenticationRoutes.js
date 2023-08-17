@@ -1,6 +1,7 @@
 import express from "express";
 import loginController from "../app/controllers/LoginController";
 import { check, validationResult } from "express-validator";
+import verifyToken from "../app/middlewares/verifyToken";
 
 const errorsFormatter = ({ msg }) => {
 	return `${msg}`;
@@ -37,8 +38,17 @@ router.post(
 );
 
 router.post("/logout", (req, res) => {
-	req.headers["x-access-token"] = null;
-	res.status(200).json({ msg: "Usuário deslogado com sucesso!" });
+	res.clearCookie("token");
+	res.status(200).send();
+});
+
+router.post("/loggedUser", verifyToken, (req, res) => {
+	res.cookie("loggedUser", {
+		username: req.username,
+		userId: req.userId,
+		userType: req.userType,
+	});
+	res.status(200).send();
 });
 
 export default router;
