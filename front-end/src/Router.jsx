@@ -1,31 +1,45 @@
 import { createBrowserRouter } from "react-router-dom";
 import LoginPage from "./pages/LoginPage";
-import AuthService from "./api/AuthService";
 import Layout from "./layouts/Layout";
 import CreateAccountPage from "./pages/CreateAccountPage";
-
-/*const response = await AuthService.verifyIfUserIsLoggedIn();
-if (response.errors) {
-	localStorage.setItem("isLogged", false);
-} else {
-	localStorage.setItem("isLogged", true);
-}*/
+import CreateMediaPage from "./pages/CreateMediaPage";
+import ListUsersPage from "./pages/ListUsersPage";
+import HomePage from "./pages/HomePage";
 
 const Router = createBrowserRouter([
 	{
-		path: "/login",
-		element: <LoginPage />,
+		element: <Layout includeNavBar={false} />,
+		children: [
+			{
+				path: "/login",
+				element: <LoginPage />,
+			},
+			{
+				path: "user",
+				children: [
+					{
+						path: "register",
+						element: <CreateAccountPage />,
+					},
+				],
+			},
+			{
+				path: "media",
+				children: [{ path: "create", element: <CreateMediaPage /> }],
+			},
+		],
 	},
+
 	{
-		path: "/user/register",
-		element: <CreateAccountPage />,
-	},
-	{
-		element: <Layout />,
+		element: <Layout includeNavBar={true} />,
 		children: [
 			{
 				path: "/",
-				element: "Pagina Inicial",
+				element: <HomePage />,
+			},
+			{
+				path: "user",
+				children: [{ path: "listUsers", element: <ListUsersPage /> }],
 			},
 		],
 	},

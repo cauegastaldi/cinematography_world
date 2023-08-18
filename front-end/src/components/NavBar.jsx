@@ -43,7 +43,7 @@ const NavBar = () => {
 							</Nav.Link>
 						</LinkContainer>
 						{userType === "ADMIN" && (
-							<LinkContainer to={"#"}>
+							<LinkContainer to={"/media/create"}>
 								<Nav.Link className="link">
 									<b>Cadastrar Mídia</b>
 								</Nav.Link>
@@ -52,12 +52,16 @@ const NavBar = () => {
 
 						{userType === "ADMIN" && (
 							<LinkContainer to={"/user/register"}>
-								<Nav.Link className="link">Criar Administrador</Nav.Link>
+								<Nav.Link className="link">
+									<b>Criar Administrador</b>
+								</Nav.Link>
 							</LinkContainer>
 						)}
 						{userType === "ADMIN" && (
-							<LinkContainer to={"#"}>
-								<Nav.Link className="link">Listar Usuários</Nav.Link>
+							<LinkContainer to={"/user/listUsers"}>
+								<Nav.Link className="link">
+									<b>Listar Usuários</b>
+								</Nav.Link>
 							</LinkContainer>
 						)}
 						{isUserLogged && (

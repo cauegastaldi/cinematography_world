@@ -26,6 +26,10 @@ const Media = db.define("cinematography_media", {
 		type: Sequelize.STRING,
 		allowNull: false,
 	},
+	posterPath: {
+		type: Sequelize.STRING,
+		allowNull: false,
+	},
 });
 
 Media.hasMany(Review, {

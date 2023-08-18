@@ -1,9 +1,9 @@
 import multer from "multer";
 
-const parser = multer({ dest: "public/uploads" });
+const uploader = multer({ dest: "public/uploads" });
 
 export default async (req, res) => {
-	parser.single("mediaImage")(req, res, (err) => {
+	uploader.single("mediaPoster")(req, res, (err) => {
 		if (err) {
 			res.status(500).json({ error: 1, payload: err });
 		} else {

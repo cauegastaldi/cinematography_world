@@ -1,10 +1,11 @@
 import axios from "axios";
 
-const baseUrl = "http://localhost:8000/users";
+const baseUrl = "http://localhost:8000/medias";
+const uploadUrl = "http://localhost:8000/upload";
 
-const createNormalUser = async (data) => {
+const createMedia = async (data) => {
 	const response = axios
-		.post(`${baseUrl}/registerUser`, data)
+		.post(`${baseUrl}`, data)
 		.then((response) => {
 			return response.data;
 		})
@@ -20,11 +21,11 @@ const createNormalUser = async (data) => {
 	return response;
 };
 
-const createAdminUser = async (data) => {
+const uploadMediaPoster = async (formData) => {
 	const response = axios
-		.post(`${baseUrl}/registerAdmin`, data)
+		.post(`${uploadUrl}`, formData)
 		.then((response) => {
-			return response.data;
+			return `http://localhost:8000${response.data.payload.url}`;
 		})
 		.catch((error) => {
 			if (error.response) {
@@ -38,13 +39,13 @@ const createAdminUser = async (data) => {
 	return response;
 };
 
-const findAllUsers = async (setData) => {
+const findAllMedias = async (setData) => {
 	axios.get(`${baseUrl}`).then((response) => {
 		setData(response.data.users);
 	});
 };
 
-const findUserById = async (id) => {
+const findOneMedia = async (id) => {
 	const response = axios
 		.get(`${baseUrl}/${id}`)
 		.then((response) => {
@@ -62,25 +63,7 @@ const findUserById = async (id) => {
 	return response;
 };
 
-const findUserByName = async (name) => {
-	const response = axios
-		.get(`${baseUrl}/name/${name}`)
-		.then((response) => {
-			return response.data;
-		})
-		.catch((error) => {
-			if (error.response) {
-				return { errors: error.response.data.errorData };
-			} else if (error.request) {
-				console.error(error.request);
-			} else {
-				console.error(error.message);
-			}
-		});
-	return response;
-};
-
-const updateUser = async (id, data) => {
+const updateMedia = async (id, data) => {
 	const response = await axios.put(`${baseUrl}/${id}`, data).catch((error) => {
 		if (error.response) {
 			return { errors: error.response.data.errorData };
@@ -95,7 +78,7 @@ const updateUser = async (id, data) => {
 	return response;
 };
 
-const removeUser = async (id) => {
+const removeMedia = async (id) => {
 	const response = await axios.delete(`${baseUrl}/${id}`).catch((error) => {
 		if (error.response) {
 			return { error: error.response.data };
@@ -112,11 +95,10 @@ const removeUser = async (id) => {
 };
 
 export default {
-	createNormalUser,
-	createAdminUser,
-	updateUser,
-	removeUser,
-	findAllUsers,
-	findUserById,
-	findUserByName,
+	createMedia,
+	updateMedia,
+	removeMedia,
+	findAllMedias,
+	findOneMedia,
+	uploadMediaPoster,
 };

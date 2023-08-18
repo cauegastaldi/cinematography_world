@@ -1,6 +1,7 @@
 {
 	"scripts": {
-		"dev": "nodemon --exec babel-node app.js"
+		"dev": "nodemon --exec babel-node app.js",
+		"createAdmin": "nodemon --exec babel-node scripts/createAdmin.js"
 	},
 	"dependencies": {
 		"bcryptjs": "^2.4.3",

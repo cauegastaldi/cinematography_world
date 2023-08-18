@@ -21,6 +21,7 @@ function addMedia(req, res) {
 		releaseYear: req.body.releaseYear,
 		genre: req.body.genre,
 		director: req.body.director,
+		posterPath: req.body.path,
 	}).then((result) => res.status(200).json(result));
 }
 

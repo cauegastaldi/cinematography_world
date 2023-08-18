@@ -73,6 +73,12 @@ router.post(
 		.trim()
 		.notEmpty()
 		.withMessage("Diretor não pode ser vazio!"),
+	check("posterPath")
+		.exists()
+		.withMessage("Caminho do poster da mídia não pode ser nulo!")
+		.trim()
+		.notEmpty()
+		.withMessage("Caminho do poster da mídia não pode ser vazio!"),
 	async (req, res) => {
 		const result = validationResult(req).formatWith(errorsFormatter);
 		try {

@@ -44,6 +44,38 @@ router.get(
 	}
 );
 
+router.get(
+	"/name/:name",
+	check("name")
+		.exists()
+		.withMessage("Nome não pode ser nulo!")
+		.trim()
+		.notEmpty()
+		.withMessage("Nome não pode ser vazio!"),
+	async (req, res) => {
+		const result = validationResult(req).formatWith(errorsFormatter);
+		try {
+			result.throw();
+
+			const user = await userController.findUserByUsername(req.params.name);
+
+			if (user == null) {
+				return res.status(400).json({
+					errorCode: "ERRO_USUARIO_NAO_ENCONTRADO",
+					errorData: "Usuário não encontrado! Por favor, informe um usuário existente.",
+				});
+			}
+
+			res.status(200).json(user);
+		} catch (error) {
+			res.status(400).json({
+				codigoErro: "ERRO_CAMPOS_INVALIDOS",
+				dadosErro: error.mapped(),
+			});
+		}
+	}
+);
+
 router.post(
 	"/registerAdmin",
 	verifyToken,
