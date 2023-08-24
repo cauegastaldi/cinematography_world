@@ -1,4 +1,20 @@
 .mediaCard {
-	width: 230px;
-	height: 345px;
+	width: 140px;
+	min-height: 200px;
+}
+
+.mediaCard:hover {
+	cursor: pointer;
+}
+
+.mediaPoster {
+	min-height: 200px;
+	max-height: 200px;
+	width: 100%;
+}
+
+.btn {
+	font-size: 0.95em;
+	letter-spacing: 0.05rem;
+	padding: 0.75rem 1rem;
 }

@@ -2,12 +2,24 @@ import Review from "../modules/Review";
 import CinematographyMediaController from "./CinematographyMediaController";
 import UserController from "./UserController";
 
-function findAll(req, res) {
-	Review.findAll().then((result) => res.json(result));
+async function findAll(req, res) {
+	let result = await Review.findAll();
+	result = result.map((review) => {
+		return review.dataValues;
+	});
+	res.status(200).json(result);
 }
 
 async function findReviewById(id) {
 	return await Review.findByPk(id);
+}
+
+async function findReviewsByMediaId(mediaId, res) {
+	Review.findAll({
+		where: {
+			mediaId: mediaId,
+		},
+	}).then((result) => res.json(result));
 }
 
 async function addReview(req, res) {
@@ -88,4 +100,11 @@ async function deleteReview(req, res) {
 	return res.status(200).send({ msg: "Análise deletada com sucesso!" });
 }
 
-export default { findAll, findReviewById, addReview, updateReview, deleteReview };
+export default {
+	findAll,
+	findReviewById,
+	findReviewsByMediaId,
+	addReview,
+	updateReview,
+	deleteReview,
+};

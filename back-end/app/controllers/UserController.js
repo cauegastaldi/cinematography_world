@@ -1,8 +1,17 @@
+import Review from "../modules/Review";
 import User from "../modules/User";
 import passwordUtils from "../utils/User/passwordUtils";
-
-function findAll(req, res) {
-	User.findAll().then((result) => res.json(result));
+import sequelize from "../../database/db";
+async function findAll(req, res) {
+	let result = await User.findAll();
+	result = result.map((user) => {
+		return {
+			id: user.dataValues.id,
+			username: user.dataValues.username,
+			userType: user.dataValues.userType,
+		};
+	});
+	res.status(200).json(result);
 }
 
 async function findUserById(id) {
@@ -11,9 +20,10 @@ async function findUserById(id) {
 
 async function findUserByUsername(username) {
 	return await User.findOne({
-		where: {
-			username: username,
-		},
+		where: sequelize.where(
+			sequelize.fn("lower", sequelize.col("username")),
+			sequelize.fn("lower", username)
+		),
 	});
 }
 
@@ -46,6 +56,10 @@ async function addUser(req, res) {
 	}).then((result) => res.status(200).json(result));
 }
 
+function findReviews(userId, res) {
+	Review.findAll({ where: { userId: userId } }).then((response) => res.json(response));
+}
+
 async function updateUser(req, res) {
 	const user = await User.findByPk(req.params.id);
 
@@ -60,13 +74,15 @@ async function updateUser(req, res) {
 	let password = req.body.password;
 
 	if (username != null) {
-		const uniqueUsername = await usernameIsUnique(username);
-		if (!uniqueUsername) {
-			return res.status(400).json({
-				errorCode: "ERRO_USERNAME_EXISTENTE",
-				errorData:
-					"O nome de usuário escolhido já existe! Por favor, informe um novo nome de usuário",
-			});
+		if (user.username !== username) {
+			const uniqueUsername = await usernameIsUnique(username);
+			if (!uniqueUsername) {
+				return res.status(400).json({
+					errorCode: "ERRO_USERNAME_EXISTENTE",
+					errorData:
+						"O nome de usuário escolhido já existe! Por favor, informe um novo nome de usuário",
+				});
+			}
 		}
 		user.username = username;
 	}
@@ -111,4 +127,12 @@ async function usernameIsUnique(username) {
 	return user == null;
 }
 
-export default { findAll, findUserById, findUserByUsername, addUser, updateUser, deleteUser };
+export default {
+	findAll,
+	findUserById,
+	findReviews,
+	findUserByUsername,
+	addUser,
+	updateUser,
+	deleteUser,
+};

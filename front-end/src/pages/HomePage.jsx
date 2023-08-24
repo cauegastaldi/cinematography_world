@@ -1,31 +1,41 @@
 import "../styles/HomePage.css";
-import { useState } from "react";
-import { Card, Col, Fade, Row } from "react-bootstrap";
+import { Col, Row } from "react-bootstrap";
+import MediaCard from "../components/Media/MediaCard";
+import { useAuth } from "../hooks/useAuth";
+import { useEffect, useState } from "react";
+import MediaService from "../api/MediaService";
 
 const HomePage = () => {
-	const [open, setOpen] = useState(false);
+	const auth = useAuth();
+	const userType = auth.user?.userType;
+	const [medias, setMedias] = useState([]);
+
+	const loadData = () => {
+		MediaService.findAllMedias(setMedias);
+	};
+
+	useEffect(() => {
+		loadData();
+	}, []);
 
 	return (
 		<>
-			<Row className="my-2">
-				<Col className="col-sm-9 col-md-7 col-lg-5 mx-auto">
-					<Card
-						onMouseOver={() => setOpen(true)}
-						onMouseOut={() => setOpen(false)}
-						className="mediaCard"
-					>
-						<Fade
-							in={open}
-							timeout={0.3}
+			<Row className="gy-3 my-2">
+				{medias.map((media) => {
+					return (
+						<Col
+							sm={4}
+							md={3}
+							lg={2}
 						>
-							<div id="example-fade-text">
-								Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus
-								terry richardson ad squid. Nihil anim keffiyeh helvetica, craft beer
-								labore wes anderson cred nesciunt sapiente ea proident.
-							</div>
-						</Fade>
-					</Card>
-				</Col>
+							<MediaCard
+								key={media.id}
+								media={media}
+								userType={userType}
+							/>
+						</Col>
+					);
+				})}
 			</Row>
 		</>
 	);

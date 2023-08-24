@@ -28,17 +28,38 @@ router.get(
 			const user = await userController.findUserById(req.params.id);
 
 			if (user == null) {
-				return res.status(400).json({
-					errorCode: "ERRO_USUARIO_NAO_ENCONTRADO",
-					errorData: "Usuário não encontrado! Por favor, informe um usuário existente.",
-				});
+				return res.status(400).json(null);
 			}
 
 			res.status(200).json(user);
 		} catch (error) {
 			res.status(400).json({
-				codigoErro: "ERRO_CAMPOS_INVALIDOS",
-				dadosErro: error.mapped(),
+				errorCode: "ERRO_CAMPOS_INVALIDOS",
+				errorData: error.mapped(),
+			});
+		}
+	}
+);
+
+router.get(
+	"/:userId/reviews",
+	check("userId")
+		.exists()
+		.withMessage("userId não pode ser nulo!")
+		.isInt()
+		.withMessage("userId deve ser um número inteiro!")
+		.custom((id) => id > 0)
+		.withMessage("userId não pode ser negativo!"),
+	async (req, res) => {
+		const result = validationResult(req).formatWith(errorsFormatter);
+		try {
+			result.throw();
+
+			userController.findReviews(req.params.userId, res);
+		} catch (error) {
+			res.status(400).json({
+				errorCode: "ERRO_CAMPOS_INVALIDOS",
+				errorData: error.mapped(),
 			});
 		}
 	}
@@ -69,8 +90,8 @@ router.get(
 			res.status(200).json(user);
 		} catch (error) {
 			res.status(400).json({
-				codigoErro: "ERRO_CAMPOS_INVALIDOS",
-				dadosErro: error.mapped(),
+				errorCode: "ERRO_CAMPOS_INVALIDOS",
+				errorData: error.mapped(),
 			});
 		}
 	}
@@ -99,8 +120,8 @@ router.post(
 			userController.addUser(req, res);
 		} catch (error) {
 			res.status(400).json({
-				codigoErro: "ERRO_CAMPOS_INVALIDOS",
-				dadosErro: error.mapped(),
+				errorCode: "ERRO_CAMPOS_INVALIDOS",
+				errorData: error.mapped(),
 			});
 		}
 	}
@@ -129,8 +150,8 @@ router.post(
 			userController.addUser(req, res);
 		} catch (error) {
 			res.status(400).json({
-				codigoErro: "ERRO_CAMPOS_INVALIDOS",
-				dadosErro: error.mapped(),
+				errorCode: "ERRO_CAMPOS_INVALIDOS",
+				errorData: error.mapped(),
 			});
 		}
 	}
@@ -178,8 +199,8 @@ router.delete(
 			userController.deleteUser(req, res);
 		} catch (error) {
 			res.status(400).json({
-				codigoErro: "ERRO_CAMPOS_INVALIDOS",
-				dadosErro: error.mapped(),
+				errorCode: "ERRO_CAMPOS_INVALIDOS",
+				errorData: error.mapped(),
 			});
 		}
 	}

@@ -22,7 +22,7 @@ const createNormalUser = async (data) => {
 
 const createAdminUser = async (data) => {
 	const response = axios
-		.post(`${baseUrl}/registerAdmin`, data)
+		.post(`${baseUrl}/registerAdmin`, data, { withCredentials: true })
 		.then((response) => {
 			return response.data;
 		})
@@ -38,9 +38,22 @@ const createAdminUser = async (data) => {
 	return response;
 };
 
-const findAllUsers = async (setData) => {
-	axios.get(`${baseUrl}`).then((response) => {
-		setData(response.data.users);
+const findAllUsers = async () => {
+	const response = axios.get(`${baseUrl}`).then((response) => {
+		return response.data;
+	});
+
+	return response;
+};
+
+const findMediaReviews = async (userId, mediaId) => {
+	axios.get(`${baseUrl}/${userId}/reviews`).then((response) => {
+		if (response) {
+			const mediaReviews = response.filter((review) => {
+				return review.mediaId === mediaId;
+			});
+			return mediaReviews;
+		}
 	});
 };
 
@@ -48,7 +61,7 @@ const findUserById = async (id) => {
 	const response = axios
 		.get(`${baseUrl}/${id}`)
 		.then((response) => {
-			return response.data.user;
+			return response.data;
 		})
 		.catch((error) => {
 			if (error.response) {
@@ -81,32 +94,36 @@ const findUserByName = async (name) => {
 };
 
 const updateUser = async (id, data) => {
-	const response = await axios.put(`${baseUrl}/${id}`, data).catch((error) => {
-		if (error.response) {
-			return { errors: error.response.data.errorData };
-		} else if (error.request) {
-			console.error(error.request);
-			return {};
-		} else {
-			console.error(error.message);
-			return {};
-		}
-	});
+	const response = await axios
+		.put(`${baseUrl}/${id}`, data, { withCredentials: true })
+		.catch((error) => {
+			if (error.response) {
+				return { errors: error.response.data.errorData };
+			} else if (error.request) {
+				console.error(error.request);
+				return {};
+			} else {
+				console.error(error.message);
+				return {};
+			}
+		});
 	return response;
 };
 
 const removeUser = async (id) => {
-	const response = await axios.delete(`${baseUrl}/${id}`).catch((error) => {
-		if (error.response) {
-			return { error: error.response.data };
-		} else if (error.request) {
-			console.error(error.request);
-			return {};
-		} else {
-			console.error(error.message);
-			return {};
-		}
-	});
+	const response = await axios
+		.delete(`${baseUrl}/${id}`, { withCredentials: true })
+		.catch((error) => {
+			if (error.response) {
+				return { error: error.response.data };
+			} else if (error.request) {
+				console.error(error.request);
+				return {};
+			} else {
+				console.error(error.message);
+				return {};
+			}
+		});
 
 	return response;
 };
@@ -119,4 +136,5 @@ export default {
 	findAllUsers,
 	findUserById,
 	findUserByName,
+	findMediaReviews,
 };

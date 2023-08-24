@@ -28,10 +28,7 @@ router.get(
 			const media = await mediaController.findMediaById(req.params.id);
 
 			if (media == null) {
-				return res.status(400).json({
-					errorCode: "ERRO_MIDIA_NAO_ENCONTRADA",
-					errorData: `Mídia não encontrada! Por favor, informe uma mídia existente.`,
-				});
+				return res.status(400).json(null);
 			}
 			res.status(200).json(media);
 		} catch (error) {
@@ -114,6 +111,11 @@ router.put(
 		.custom((releaseYear) => releaseYear.toString().length == 4)
 		.withMessage("Ano de lançamento deve possuir 4 digitos"),
 	check("director").optional().trim().notEmpty().withMessage("Diretor não pode ser vazio!"),
+	check("posterPath")
+		.optional()
+		.trim()
+		.notEmpty()
+		.withMessage("Caminho do poster da mídia não pode ser vazio!"),
 	async (req, res) => {
 		const result = validationResult(req).formatWith(errorsFormatter);
 		try {

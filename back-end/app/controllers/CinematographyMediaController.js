@@ -1,7 +1,13 @@
+import { resolve } from "path";
 import Media from "../modules/CinematographyMedia";
+import fs from "fs";
 
-function findAll(req, res) {
-	Media.findAll().then((result) => res.json(result));
+async function findAll(req, res) {
+	let result = await Media.findAll();
+	result = result.map((media) => {
+		return media.dataValues;
+	});
+	res.status(200).json(result);
 }
 
 async function findMediaById(id) {
@@ -21,7 +27,7 @@ function addMedia(req, res) {
 		releaseYear: req.body.releaseYear,
 		genre: req.body.genre,
 		director: req.body.director,
-		posterPath: req.body.path,
+		posterPath: req.body.posterPath,
 	}).then((result) => res.status(200).json(result));
 }
 
@@ -46,6 +52,7 @@ async function updateMedia(req, res) {
 	const releaseYear = req.body.releaseYear;
 	const genre = req.body.genre;
 	const director = req.body.director;
+	const posterPath = req.body.posterPath;
 
 	if (name != null) media.name = name;
 
@@ -54,6 +61,8 @@ async function updateMedia(req, res) {
 	if (genre != null) media.genre = genre;
 
 	if (director != null) media.director = director;
+
+	if (posterPath != null) media.posterPath = posterPath;
 
 	await media.save();
 
@@ -78,6 +87,11 @@ async function deleteMedia(req, res) {
 	}
 
 	await media.destroy();
+	fs.unlink(resolve(__dirname, `../../public${media.posterPath}`), (err) => {
+		if (err) {
+			console.log(err);
+		}
+	});
 
 	return res.status(200).send({ msg: "Mídia deletada com sucesso!" });
 }

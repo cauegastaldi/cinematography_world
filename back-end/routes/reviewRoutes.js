@@ -12,6 +12,29 @@ const router = express.Router();
 router.get("/", reviewController.findAll);
 
 router.get(
+	"/:mediaId",
+	check("mediaId")
+		.exists()
+		.withMessage("ID não pode ser nulo!")
+		.isInt()
+		.withMessage("ID deve ser um número inteiro!")
+		.custom((id) => id > 0)
+		.withMessage("ID não pode ser negativo!"),
+	async (req, res) => {
+		const result = validationResult(req).formatWith(errorsFormatter);
+		try {
+			result.throw();
+			reviewController.findReviewsByMediaId(req.params.mediaId, res);
+		} catch (error) {
+			res.status(400).json({
+				codigoErro: "ERRO_CAMPOS_INVALIDOS",
+				dadosErro: error.mapped(),
+			});
+		}
+	}
+);
+
+/*router.get(
 	"/:id",
 	check("id")
 		.exists()
@@ -42,7 +65,7 @@ router.get(
 			});
 		}
 	}
-);
+);*/
 
 router.post(
 	"/",

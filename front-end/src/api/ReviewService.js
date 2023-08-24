@@ -1,9 +1,8 @@
 import axios from "axios";
 
-const baseUrl = "http://localhost:8000/medias";
-const uploadUrl = "http://localhost:8000/upload";
+const baseUrl = "http://localhost:8000/reviews";
 
-const createMedia = async (data) => {
+const createReview = async (data) => {
 	const response = axios
 		.post(`${baseUrl}`, data, { withCredentials: true })
 		.then((response) => {
@@ -21,39 +20,21 @@ const createMedia = async (data) => {
 	return response;
 };
 
-const uploadMediaPoster = async (formData) => {
-	const response = axios
-		.post(`${uploadUrl}`, formData, { withCredentials: true })
-		.then((response) => {
-			return `${response.data.payload.url}`;
-		})
-		.catch((error) => {
-			if (error.response) {
-				return { errors: error.response.data };
-			} else if (error.request) {
-				console.error(error.request);
-			} else {
-				console.error(error.message);
-			}
-		});
-	return response;
-};
-
-const findAllMedias = async (setData) => {
-	axios.get(`${baseUrl}`).then((response) => {
-		setData(response.data);
+const findAllMediaReviews = async (mediaId, setReviews) => {
+	axios.get(`${baseUrl}/${mediaId}`).then((response) => {
+		setReviews(response.data);
 	});
 };
 
-const findOneMedia = async (id) => {
+const findReviewById = async (id, setReview) => {
 	const response = axios
 		.get(`${baseUrl}/${id}`)
 		.then((response) => {
-			return response.data;
+			setReview(response.data);
 		})
 		.catch((error) => {
 			if (error.response) {
-				return error.response.data;
+				return { errors: error.response.data.errorData };
 			} else if (error.request) {
 				console.error(error.request);
 			} else {
@@ -63,7 +44,7 @@ const findOneMedia = async (id) => {
 	return response;
 };
 
-const updateMedia = async (id, data) => {
+const updateReview = async (id, data) => {
 	const response = await axios
 		.put(`${baseUrl}/${id}`, data, { withCredentials: true })
 		.catch((error) => {
@@ -80,7 +61,7 @@ const updateMedia = async (id, data) => {
 	return response;
 };
 
-const removeMedia = async (id) => {
+const removeReview = async (id) => {
 	const response = await axios
 		.delete(`${baseUrl}/${id}`, { withCredentials: true })
 		.catch((error) => {
@@ -99,10 +80,9 @@ const removeMedia = async (id) => {
 };
 
 export default {
-	createMedia,
-	updateMedia,
-	removeMedia,
-	findAllMedias,
-	findOneMedia,
-	uploadMediaPoster,
+	createReview,
+	updateReview,
+	removeReview,
+	findAllMediaReviews,
+	findReviewById,
 };

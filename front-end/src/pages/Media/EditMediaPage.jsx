@@ -1,15 +1,16 @@
-import "../styles/Form.css";
+import { useLoaderData } from "react-router-dom";
+import "../../styles/Form.css";
 import * as yup from "yup";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import AuthService from "../api/AuthService";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
-import { useAuth } from "../hooks/useAuth";
-import UserService from "../api/UserService";
-import MediaService from "../api/MediaService";
+import { useAuth } from "../../hooks/useAuth";
+import MediaService from "../../api/MediaService";
 
-const CreateMediaPage = () => {
+const EditMediaPage = () => {
+	const media = useLoaderData();
+
 	const auth = useAuth();
 	const userType = auth.user?.userType;
 
@@ -28,15 +29,15 @@ const CreateMediaPage = () => {
 			.required("Por favor, insira o ano de lançamento"),
 		genre: yup.string().required("Por favor, insira o(s) gênero(s)"),
 		director: yup.string().required("Por favor, insira o nome do(s) diretor(es)"),
-		mediaPoster: yup
-			.mixed()
-			.test("required", "Por favor, envie uma imagem para ser o pôster da midia", (file) => {
-				if (file.length > 0) return true;
-				return false;
-			}),
 	});
 
 	const form = useForm({
+		defaultValues: {
+			name: media ? media.name : "",
+			releaseYear: media ? media.releaseYear : "",
+			genre: media ? media.genre : "",
+			director: media ? media.director : "",
+		},
 		resolver: yupResolver(schema),
 	});
 
@@ -46,25 +47,28 @@ const CreateMediaPage = () => {
 	const navigate = useNavigate();
 
 	const onSubmit = async (data) => {
-		const formData = new FormData();
-		formData.append("mediaPoster", data.mediaPoster[0]);
-		const uploadResponse = await MediaService.uploadMediaPoster(formData);
-		if (uploadResponse.errors) {
-			setError("createMedia", { message: uploadResponse.errors.payload });
+		let uploadResponse = null;
+		if (data.mediaPoster[0]) {
+			const formData = new FormData();
+			formData.append("mediaPoster", data.mediaPoster[0]);
+			uploadResponse = await MediaService.uploadMediaPoster(formData);
+		}
+		if (uploadResponse?.errors) {
+			setError("editMedia", { message: uploadResponse.errors.payload });
 		} else {
-			console.log(uploadResponse);
-			const createResponse = await MediaService.createMedia({
+			await MediaService.updateMedia(media.id, {
 				name: data.name,
 				releaseYear: data.releaseYear,
 				genre: data.genre,
 				director: data.director,
-				posterPath: uploadResponse,
+				posterPath: uploadResponse ? uploadResponse : media.posterPath,
 			});
+			navigate("/");
 		}
 	};
 
 	useEffect(() => {
-		if (userType !== "ADMIN") {
+		if (userType !== "ADMIN" || media == null) {
 			navigate("/");
 		}
 	}, []);
@@ -75,15 +79,15 @@ const CreateMediaPage = () => {
 				<div className="col-sm-9 col-md-7 col-lg-5 mx-auto">
 					<div className="card border-0 shadow rounded-3 my-5">
 						<div className="card-body p-4 p-sm-5">
-							<h5 className="card-title text-center mb-5 ">Cadastrar Mídia</h5>
-							{errors.createMedia && (
+							<h5 className="card-title text-center mb-5 ">Editar Mídia</h5>
+							{errors.editMedia && (
 								<div className="card text-white bg-dark shadow rounded-1 my-4">
 									<div className="card-body p-3">
 										<p
 											className="card-text"
 											style={{ fontSize: "0.9em" }}
 										>
-											{errors?.createMedia?.message}
+											{errors?.editMedia?.message}
 										</p>
 									</div>
 								</div>
@@ -198,7 +202,7 @@ const CreateMediaPage = () => {
 										className="btn btn-primary btn-login text-uppercase fw-bold"
 										type="submit"
 									>
-										Cadastrar
+										Salvar
 									</button>
 								</div>
 								<div className="d-grid mb-2">
@@ -218,6 +222,7 @@ const CreateMediaPage = () => {
 			</div>
 		</>
 	);
+	return "Página de edição...";
 };
 
-export default CreateMediaPage;
+export default EditMediaPage;
