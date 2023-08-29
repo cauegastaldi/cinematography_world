@@ -2,7 +2,7 @@ import "../../styles/Form.css";
 import * as yup from "yup";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useNavigate } from "react-router-dom";
+import { useLoaderData, useNavigate, useRouteLoaderData } from "react-router-dom";
 import { useEffect } from "react";
 import { useAuth } from "../../hooks/useAuth";
 import MediaService from "../../api/MediaService";
@@ -10,6 +10,8 @@ import MediaService from "../../api/MediaService";
 const CreateMediaPage = () => {
 	const auth = useAuth();
 	const userType = auth.user?.userType;
+	//const { isUserLogged } = useRouteLoaderData("root");
+	//console.log(isUserLogged);
 
 	const schema = yup.object({
 		name: yup.string().required("Por favor, insira um nome"),
@@ -60,12 +62,6 @@ const CreateMediaPage = () => {
 			navigate("/");
 		}
 	};
-
-	useEffect(() => {
-		if (userType !== "ADMIN") {
-			navigate("/");
-		}
-	}, []);
 
 	return (
 		<>

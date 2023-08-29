@@ -7,6 +7,7 @@ async function findAll(req, res) {
 	result = result.map((review) => {
 		return review.dataValues;
 	});
+
 	res.status(200).json(result);
 }
 
@@ -15,16 +16,21 @@ async function findReviewById(id) {
 }
 
 async function findReviewsByMediaId(mediaId, res) {
-	Review.findAll({
+	let result = await Review.findAll({
 		where: {
 			mediaId: mediaId,
 		},
-	}).then((result) => res.json(result));
+	});
+	result = result.map((review) => {
+		return review.dataValues;
+	});
+
+	res.status(200).json(result);
 }
 
 async function addReview(req, res) {
 	const mediaId = req.body.mediaId;
-	const userId = req.body.userId;
+	const userId = req.userId;
 	const media = await CinematographyMediaController.findMediaById(mediaId);
 	const user = await UserController.findUserById(userId);
 

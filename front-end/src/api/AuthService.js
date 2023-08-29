@@ -48,7 +48,7 @@ const verifyIfUserIsLoggedIn = async () => {
 	const response = await axios
 		.post(`${baseUrl}/loggedUser`, undefined, { withCredentials: true })
 		.then((response) => {
-			return response.status;
+			return response.data;
 		})
 		.catch((error) => {
 			if (error.response) {

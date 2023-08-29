@@ -3,6 +3,7 @@ import { useLoaderData, useNavigate } from "react-router-dom";
 import "../../styles/ListUserPage.css";
 import { useEffect } from "react";
 import { useAuth } from "../../hooks/useAuth";
+import UserService from "../../api/UserService";
 
 const ListUsersPage = () => {
 	const auth = useAuth();
@@ -11,16 +12,22 @@ const ListUsersPage = () => {
 
 	const navigate = useNavigate();
 
+	const handleUserDeletion = async (id) => {
+		await UserService.removeUser(id);
+	};
+
 	useEffect(() => {
 		if (userType !== "ADMIN") {
 			navigate("/");
 		}
 	});
+
 	return (
 		<Table
 			bordered
 			responsive
 			hover
+			variant="dark"
 		>
 			<thead>
 				<tr>
@@ -38,7 +45,12 @@ const ListUsersPage = () => {
 							<td>{user.username}</td>
 							<td>{(user.userType === "ADMIN" && "Administrador") || "Normal"}</td>
 							<td>
-								<button className="btn btn-danger text-uppercase fw-bold">
+								<button
+									className="btn btn-remove-user btn-danger text-uppercase fw-bold"
+									onClick={() => {
+										handleUserDeletion(user.id);
+									}}
+								>
 									Excluir
 								</button>
 							</td>

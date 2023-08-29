@@ -2,7 +2,6 @@ import "../styles/Form.css";
 import * as yup from "yup";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import AuthService from "../api/AuthService";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { useAuth } from "../hooks/useAuth";
@@ -31,7 +30,7 @@ const CreateAccountPage = () => {
 		const password = data.password;
 		try {
 			const response = await UserService.findUserByName(username);
-			if (!response.errors) {
+			if (response.errors) {
 				setError("createAccount", { message: "Username já está sendo utilizado" });
 			} else {
 				if (userType !== "ADMIN") {

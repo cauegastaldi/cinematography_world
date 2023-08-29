@@ -1,4 +1,3 @@
-import "../styles/HomePage.css";
 import { Col, Row } from "react-bootstrap";
 import MediaCard from "../components/Media/MediaCard";
 import { useAuth } from "../hooks/useAuth";

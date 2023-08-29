@@ -1,8 +1,11 @@
 import { useState } from "react";
 import { Button, ButtonGroup, Card, Container, Fade, Image, Modal } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import "../../styles/Modal.css";
+
 import MediaService from "../../api/MediaService";
+import styles from "../../styles/HomePage/MediaCard.module.css";
+import modalStyles from "../../styles/HomePage/RemoveModal.module.css";
+import "../../styles/Modal/ModalContent.css";
 
 const MediaCard = ({ media, userType }) => {
 	const [open, setOpen] = useState(false);
@@ -21,11 +24,11 @@ const MediaCard = ({ media, userType }) => {
 			<Card
 				onMouseOver={() => setOpen(true)}
 				onMouseOut={() => setOpen(false)}
-				className="mediaCard border-0 rounded-0"
+				className={`${styles.mediaCard} border-0 rounded-0`}
 			>
 				<Image
 					src={`http://localhost:8000${media.posterPath}`}
-					className="mediaPoster"
+					className={styles.mediaPoster}
 					onClick={() => {
 						window.location.href = `/reviews/${media.id}`;
 					}}
@@ -44,7 +47,7 @@ const MediaCard = ({ media, userType }) => {
 							>
 								<ButtonGroup vertical>
 									<button
-										className="btn btn-primary text-uppercase fw-bold rounded-3 mb-2"
+										className={`btn ${styles.btn} btn-primary text-uppercase fw-bold rounded-3 mb-2`}
 										style={{ pointerEvents: "auto" }}
 										onClick={() => {
 											navigate(`/media/edit/${media.id}`);
@@ -53,7 +56,7 @@ const MediaCard = ({ media, userType }) => {
 										Editar
 									</button>
 									<button
-										className="btn btn-danger text-uppercase fw-bold rounded-3"
+										className={`btn ${styles.btn} btn-danger text-uppercase fw-bold rounded-3`}
 										style={{ pointerEvents: "auto" }}
 										onClick={() => handleShow()}
 									>
@@ -65,29 +68,32 @@ const MediaCard = ({ media, userType }) => {
 					)}
 				</Card.ImgOverlay>
 			</Card>
+
 			<Modal
 				show={show}
 				onHide={handleClose}
 			>
 				<Container>
-					<Modal.Header>
-						<Modal.Title>Confirmar Exclusão</Modal.Title>
+					<Modal.Header className={modalStyles.modalHeader}>
+						<Modal.Title className={modalStyles.modalTitle}>
+							Confirmar Exclusão
+						</Modal.Title>
 						<button
 							type="button"
-							class="btn-close btn-close-white"
+							className="btn-close btn-close-white"
 							data-bs-dismiss="modal"
 							aria-label="Close"
 							onClick={() => handleClose()}
 						></button>
 					</Modal.Header>
-					<Modal.Body>
+					<Modal.Body className={modalStyles.modalBody}>
 						Tem certeza de que deseja excluir a midia? A ação não poderá ser desfeita!
 					</Modal.Body>
-					<Modal.Footer>
+					<Modal.Footer className={modalStyles.modalFooter}>
 						<Button
 							variant="secondary"
 							onClick={handleClose}
-							className="btn-modal"
+							className={modalStyles.modalBtn}
 						>
 							Cancelar
 						</Button>
@@ -96,7 +102,7 @@ const MediaCard = ({ media, userType }) => {
 							onClick={() => {
 								handleMediaDeletion();
 							}}
-							className="btn-modal"
+							className={modalStyles.modalBtn}
 						>
 							Excluir
 						</Button>

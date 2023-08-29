@@ -32,7 +32,6 @@ const LoginPage = () => {
 			if (response.errors) {
 				setError("login", { message: "Usuário ou senha inválidos" });
 			} else {
-				//localStorage.setItem("isLogged", true);
 				auth.login({
 					userId: response.userId,
 					username: response.username,

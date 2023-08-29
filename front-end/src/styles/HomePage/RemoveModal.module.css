@@ -1,29 +1,26 @@
-.modal-header {
+.modalHeader {
 	border: 0;
 }
 
-.modal-title {
+.modalTitle {
 	font-weight: bold;
 }
 
-.modal-body {
+.modalBody {
 	border: 0;
 }
 
-.modal-header,
-.modal-body {
+.modalHeader,
+.modalBody {
 	padding-left: 20px;
 }
 
-.modal-footer {
+.modalFooter {
 	border: 0;
 	font-size: 1.15em;
 }
-.modal-content {
-	background-color: #18181b;
-}
 
-.btn-modal {
+.modalBtn {
 	font-size: 0.8em;
 	letter-spacing: 0.05rem;
 	padding: 0.75rem 1rem;

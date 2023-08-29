@@ -43,12 +43,11 @@ router.post("/logout", (req, res) => {
 });
 
 router.post("/loggedUser", verifyToken, (req, res) => {
-	res.cookie("loggedUser", {
+	res.status(200).send({
 		username: req.username,
 		userId: req.userId,
 		userType: req.userType,
 	});
-	res.status(200).send();
 });
 
 export default router;

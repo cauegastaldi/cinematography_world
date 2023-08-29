@@ -1,15 +1,16 @@
-import { useState } from "react";
-import { Dropdown, Nav, NavDropdown, Navbar } from "react-bootstrap";
+import { useEffect, useState } from "react";
+import { Nav, NavDropdown, Navbar } from "react-bootstrap";
 import { Container } from "react-bootstrap";
 import AuthService from "../api/AuthService";
-import { useAuth } from "../hooks/useAuth";
+
 import "../styles/NavBar.css";
 import { LinkContainer } from "react-router-bootstrap";
+import { useAuth } from "../hooks/useAuth";
 
 const NavBar = () => {
 	const auth = useAuth();
 	const user = auth.user;
-	const [isUserLogged, setIsUserLogged] = useState(user != null);
+
 	const userType = user?.userType;
 
 	const logout = async () => {
@@ -23,7 +24,7 @@ const NavBar = () => {
 			<Navbar className="navbar">
 				<Container>
 					<Nav className="me-auto">
-						{!isUserLogged && (
+						{!user && (
 							<LinkContainer to={"/login"}>
 								<Nav.Link className="link">Login</Nav.Link>
 							</LinkContainer>
@@ -49,23 +50,23 @@ const NavBar = () => {
 							</LinkContainer>
 						)}
 
-						{isUserLogged && (
+						{user && (
 							<NavDropdown
 								id="dropdown"
 								title="Meu Perfil"
 								menuVariant="dark"
 							>
-								<LinkContainer to={`/user/edit/${user.userId}/username`}>
+								<LinkContainer to={`/user/edit/${user?.userId}/username`}>
 									<NavDropdown.Item>Alterar Username</NavDropdown.Item>
 								</LinkContainer>
 
-								<LinkContainer to={`/user/edit/${user.userId}/password`}>
+								<LinkContainer to={`/user/edit/${user?.userId}/password`}>
 									<NavDropdown.Item>Alterar Senha</NavDropdown.Item>
 								</LinkContainer>
 							</NavDropdown>
 						)}
 
-						{isUserLogged && (
+						{user && (
 							<Nav.Link
 								onClick={() => {
 									logout();

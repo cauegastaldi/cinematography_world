@@ -5,7 +5,6 @@ import CreateAccountPage from "./pages/CreateAccountPage";
 import CreateMediaPage from "./pages/Media/CreateMediaPage";
 import ListUsersPage from "./pages/User/ListUsersPage";
 import HomePage from "./pages/HomePage";
-import ReviewService from "./api/ReviewService";
 import MediaService from "./api/MediaService";
 import EditMediaPage from "./pages/Media/EditMediaPage";
 
@@ -13,6 +12,8 @@ import UserService from "./api/UserService";
 import EditUserUsernamePage from "./pages/User/EditUserUsernamePage";
 import EditUserPasswordPage from "./pages/User/EditUserPasswordPage";
 import MediaReviewsPage from "./pages/Review/MediaReviewsPage";
+
+import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
 
 const Router = createBrowserRouter([
 	{
@@ -34,14 +35,22 @@ const Router = createBrowserRouter([
 						children: [
 							{
 								path: "username",
-								element: <EditUserUsernamePage />,
+								element: (
+									<ProtectedRoute>
+										<EditUserUsernamePage />
+									</ProtectedRoute>
+								),
 								loader: async ({ params }) => {
 									return await UserService.findUserById(params.id);
 								},
 							},
 							{
 								path: "password",
-								element: <EditUserPasswordPage />,
+								element: (
+									<ProtectedRoute>
+										<EditUserPasswordPage />
+									</ProtectedRoute>
+								),
 								loader: async ({ params }) => {
 									return await UserService.findUserById(params.id);
 								},
@@ -53,10 +62,21 @@ const Router = createBrowserRouter([
 			{
 				path: "media",
 				children: [
-					{ path: "create", element: <CreateMediaPage /> },
+					{
+						path: "create",
+						element: (
+							<ProtectedRoute isAdminRoute>
+								<CreateMediaPage />
+							</ProtectedRoute>
+						),
+					},
 					{
 						path: "edit/:id",
-						element: <EditMediaPage />,
+						element: (
+							<ProtectedRoute isAdminRoute>
+								<EditMediaPage />
+							</ProtectedRoute>
+						),
 						loader: async ({ params }) => {
 							return await MediaService.findOneMedia(params.id);
 						},
@@ -78,7 +98,11 @@ const Router = createBrowserRouter([
 				children: [
 					{
 						path: "listUsers",
-						element: <ListUsersPage />,
+						element: (
+							<ProtectedRoute isAdminRoute>
+								<ListUsersPage />
+							</ProtectedRoute>
+						),
 						loader: async () => {
 							const users = await UserService.findAllUsers();
 							if (!users) return [];

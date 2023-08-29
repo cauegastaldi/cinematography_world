@@ -21,6 +21,8 @@ const createReview = async (data) => {
 };
 
 const findAllMediaReviews = async (mediaId, setReviews) => {
+	const response = await axios.get(`${baseUrl}/${mediaId}`);
+
 	axios.get(`${baseUrl}/${mediaId}`).then((response) => {
 		setReviews(response.data);
 	});

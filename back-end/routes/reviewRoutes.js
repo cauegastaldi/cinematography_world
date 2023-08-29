@@ -91,13 +91,6 @@ router.post(
 		.withMessage("Id da mídia deve ser um número inteiro!")
 		.custom((id) => id > 0)
 		.withMessage("Id da mídia não pode ser negativo!"),
-	check("userId")
-		.exists()
-		.withMessage("Id do usuário não pode ser nulo!")
-		.isInt()
-		.withMessage("Id do usuário deve ser um número inteiro!")
-		.custom((id) => id > 0)
-		.withMessage("Id do usuário não pode ser negativo!"),
 
 	async (req, res) => {
 		const result = validationResult(req).formatWith(errorsFormatter);
