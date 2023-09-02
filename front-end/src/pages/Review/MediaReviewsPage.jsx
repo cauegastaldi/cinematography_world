@@ -1,11 +1,12 @@
 import { useLoaderData } from "react-router-dom";
 import { Badge, Button, Card, Col, Image, Row } from "react-bootstrap";
-import styles from "../../styles/MediaReviewsPage/MediaReviewsPage.module.css";
 import ReviewModal from "../../components/Review/ReviewModal";
 import { useEffect, useState } from "react";
 import { useAuth } from "../../hooks/useAuth";
 import ReviewService from "../../api/ReviewService";
 import UserReview from "../../components/User/UserReview";
+import styles from "../../styles/MediaReviewsPage/MediaReviewsPage.module.css";
+import noReviewsCardStyles from "../../styles/MediaReviewsPage/NoReviewsCard.module.css";
 
 const MediaReviewsPage = () => {
 	const media = useLoaderData();
@@ -95,6 +96,43 @@ const MediaReviewsPage = () => {
 					/>
 				</Col>
 			</Row>
+
+			{reviews.length === 0 && (
+				<>
+					<Row
+						xs={1}
+						className="g-4 mt-2"
+					>
+						<Col>
+							<Card className={noReviewsCardStyles.card}>
+								<Card.Body>
+									<Card.Title
+										className={`${noReviewsCardStyles.header} text-center fs-5 fw-normal pt-3`}
+									>
+										Ainda não há análises desta mídia
+									</Card.Title>
+									<Card.Text className="text-center text-secondary p-4">
+										{(user && (
+											<span>
+												Você pode escrever a sua análise desta mídia para
+												compartilhar a sua experiência com a comunidade. Use
+												o botão da área acima nesta página para escrevê-la.
+											</span>
+										)) || (
+											<span>
+												Você pode escrever a sua análise desta mídia para
+												compartilhar a sua experiência com a comunidade.
+												Faça login e use o botão da área acima nesta página
+												para escrevê-la.
+											</span>
+										)}
+									</Card.Text>
+								</Card.Body>
+							</Card>
+						</Col>
+					</Row>
+				</>
+			)}
 
 			<Row className="mt-2">
 				{reviews.map((review) => {

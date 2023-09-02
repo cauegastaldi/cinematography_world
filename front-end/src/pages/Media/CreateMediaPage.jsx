@@ -2,16 +2,13 @@ import "../../styles/Form.css";
 import * as yup from "yup";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useLoaderData, useNavigate, useRouteLoaderData } from "react-router-dom";
-import { useEffect } from "react";
-import { useAuth } from "../../hooks/useAuth";
+import { useNavigate } from "react-router-dom";
 import MediaService from "../../api/MediaService";
+import FileValidator from "../../utils/FileValidator";
+import { useState } from "react";
 
 const CreateMediaPage = () => {
-	const auth = useAuth();
-	const userType = auth.user?.userType;
-	//const { isUserLogged } = useRouteLoaderData("root");
-	//console.log(isUserLogged);
+	const [acceptedTypes] = useState(FileValidator.acceptedTypes);
 
 	const schema = yup.object({
 		name: yup.string().required("Por favor, insira um nome"),
@@ -33,6 +30,15 @@ const CreateMediaPage = () => {
 			.test("required", "Por favor, envie uma imagem para ser o pôster da midia", (file) => {
 				if (file.length > 0) return true;
 				return false;
+			})
+			.test("is-valid-type", "Por favor, envie uma imagem com um tipo válido", (file) => {
+				return (
+					file.length > 0 &&
+					FileValidator.isValidFileType(file && file[0].name.toLowerCase(), "image")
+				);
+			})
+			.test("is-valid-size", "Tamanho máximo permitido excedido", (file) => {
+				return file.length > 0 && FileValidator.isValidSize(file[0].size);
 			}),
 	});
 
@@ -186,6 +192,12 @@ const CreateMediaPage = () => {
 											<span>{errors.mediaPoster.message}</span>
 										)}
 									</div>
+
+									<small className="fw-light">
+										Tipos aceitos: {acceptedTypes}
+										<br />
+										Tamanho máximo: {FileValidator.maxFileSizeInMb()}
+									</small>
 								</div>
 								<div className="d-grid mb-2">
 									<button

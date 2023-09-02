@@ -1,6 +1,25 @@
 import multer from "multer";
+import mime from "mime";
 
-const uploader = multer({ dest: "public/uploads" });
+const MAX_FILE_SIZE = 5242880;
+
+const uploadFilter = (req, file, cb) => {
+	const type = mime.extension(file.mimetype);
+
+	const acceptedTypes = ["png", "jpg", "jpeg"];
+
+	if (acceptedTypes.includes(`${type}`)) {
+		cb(null, true);
+	}
+
+	cb(`Imagens .${type} não são aceitas. Por favor, envie uma imagem com um tipo aceito.`, false);
+};
+
+const uploader = multer({
+	dest: "public/uploads",
+	fileFilter: uploadFilter,
+	limits: { fileSize: MAX_FILE_SIZE },
+});
 
 export default async (req, res) => {
 	uploader.single("mediaPoster")(req, res, (err) => {

@@ -33,13 +33,13 @@ const Media = db.define("cinematography_media", {
 });
 
 Media.hasMany(Review, {
+	constraints: true,
 	foreignKey: "mediaId",
+	onDelete: "CASCADE",
 });
 
 Review.belongsTo(Media, {
-	constraint: true,
 	foreignKey: "mediaId",
-	onDelete: "CASCADE",
 	as: "media",
 });
 

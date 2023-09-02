@@ -4,15 +4,13 @@ import * as yup from "yup";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
-import { useAuth } from "../../hooks/useAuth";
+import { useEffect, useState } from "react";
 import MediaService from "../../api/MediaService";
+import FileValidator from "../../utils/FileValidator";
 
 const EditMediaPage = () => {
 	const media = useLoaderData();
-
-	const auth = useAuth();
-	const userType = auth.user?.userType;
+	const [acceptedTypes] = useState(FileValidator.acceptedTypes);
 
 	const schema = yup.object({
 		name: yup.string().required("Por favor, insira um nome"),
@@ -29,6 +27,14 @@ const EditMediaPage = () => {
 			.required("Por favor, insira o ano de lançamento"),
 		genre: yup.string().required("Por favor, insira o(s) gênero(s)"),
 		director: yup.string().required("Por favor, insira o nome do(s) diretor(es)"),
+		mediaPoster: yup
+			.mixed()
+			.test("is-valid-type", "Por favor, envie uma imagem com um tipo válido", (file) => {
+				return (
+					file.length > 0 &&
+					FileValidator.isValidFileType(file && file[0].name.toLowerCase(), "image")
+				);
+			}),
 	});
 
 	const form = useForm({
@@ -68,7 +74,7 @@ const EditMediaPage = () => {
 	};
 
 	useEffect(() => {
-		if (userType !== "ADMIN" || media == null) {
+		if (media == null) {
 			navigate("/");
 		}
 	}, []);
@@ -196,6 +202,12 @@ const EditMediaPage = () => {
 											<span>{errors.mediaPoster.message}</span>
 										)}
 									</div>
+
+									<small className="fw-light">
+										Tipos aceitos: {acceptedTypes}
+										<br />
+										Tamanho máximo: {FileValidator.maxFileSizeInMb()}
+									</small>
 								</div>
 								<div className="d-grid mb-2">
 									<button

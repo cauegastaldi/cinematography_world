@@ -2,6 +2,7 @@ import Sequelize from "sequelize";
 
 import db from "../../database/db";
 import Review from "./Review.js";
+import UserLikeReview from "./UserLikeReview";
 
 const User = db.define("user", {
 	id: {
@@ -31,14 +32,19 @@ const User = db.define("user", {
 });
 
 User.hasMany(Review, {
-	constraint: true,
+	constraints: true,
 	foreignKey: "userId",
+	onDelete: "CASCADE",
+	hooks: true,
 });
 
 Review.belongsTo(User, {
 	foreignKey: "userId",
-	onDelete: "CASCADE",
 	as: "user",
+});
+
+User.beforeDestroy(async (user) => {
+	await UserLikeReview.destroy({ where: { userId: user.id } });
 });
 
 export default User;

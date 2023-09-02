@@ -81,10 +81,70 @@ const removeReview = async (id) => {
 	return response;
 };
 
+const likeReview = async (id) => {
+	const response = await axios
+		.post(`${baseUrl}/like/${id}`, null, { withCredentials: true })
+		.catch((error) => {
+			if (error.response) {
+				return { error: error.response.data };
+			} else if (error.request) {
+				console.error(error.request);
+				return {};
+			} else {
+				console.error(error.message);
+				return {};
+			}
+		});
+
+	return response;
+};
+
+const unlikeReview = async (id) => {
+	const response = await axios
+		.post(`${baseUrl}/unlike/${id}`, null, { withCredentials: true })
+		.catch((error) => {
+			if (error.response) {
+				return { error: error.response.data };
+			} else if (error.request) {
+				console.error(error.request);
+				return {};
+			} else {
+				console.error(error.message);
+				return {};
+			}
+		});
+
+	return response;
+};
+
+const findUsersWhoLikedReview = async (id) => {
+	const response = await axios
+		.get(`${baseUrl}/likes/${id}`)
+		.then((response) => {
+			return response.data;
+		})
+		.catch((error) => {
+			if (error.response) {
+				return { error: error.response.data };
+			} else if (error.request) {
+				console.error(error.request);
+				return {};
+			} else {
+				console.error(error.message);
+				return {};
+			}
+		});
+
+	return response;
+};
+
 export default {
 	createReview,
 	updateReview,
 	removeReview,
 	findAllMediaReviews,
 	findReviewById,
+	likeReview,
+	unlikeReview,
+	findUsersWhoLikedReview,
 };

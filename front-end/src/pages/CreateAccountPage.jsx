@@ -30,7 +30,7 @@ const CreateAccountPage = () => {
 		const password = data.password;
 		try {
 			const response = await UserService.findUserByName(username);
-			if (response.errors) {
+			if (!response.errors) {
 				setError("createAccount", { message: "Username já está sendo utilizado" });
 			} else {
 				if (userType !== "ADMIN") {

@@ -12,6 +12,29 @@ const router = express.Router();
 router.get("/", reviewController.findAll);
 
 router.get(
+	"/likes/:reviewId",
+	check("reviewId")
+		.exists()
+		.withMessage("ID não pode ser nulo!")
+		.isInt()
+		.withMessage("ID deve ser um número inteiro!")
+		.custom((id) => id > 0)
+		.withMessage("ID não pode ser negativo!"),
+	async (req, res) => {
+		const result = validationResult(req).formatWith(errorsFormatter);
+		try {
+			result.throw();
+			reviewController.findUsersWhoLiked(req.params.reviewId, res);
+		} catch (error) {
+			res.status(400).json({
+				codigoErro: "ERRO_CAMPOS_INVALIDOS",
+				dadosErro: error.mapped(),
+			});
+		}
+	}
+);
+
+router.get(
 	"/:mediaId",
 	check("mediaId")
 		.exists()
@@ -33,39 +56,6 @@ router.get(
 		}
 	}
 );
-
-/*router.get(
-	"/:id",
-	check("id")
-		.exists()
-		.withMessage("ID não pode ser nulo!")
-		.isInt()
-		.withMessage("ID deve ser um número inteiro!")
-		.custom((id) => id > 0)
-		.withMessage("ID não pode ser negativo!"),
-	async (req, res) => {
-		const result = validationResult(req).formatWith(errorsFormatter);
-		try {
-			result.throw();
-
-			const review = await reviewController.findReviewById(req.params.id);
-
-			if (review == null) {
-				return res.status(400).json({
-					errorCode: "ERRO_ANALISE_NAO_ENCONTRADA",
-					errorData: `Análise não encontrada! Por favor, informe uma análise existente.`,
-				});
-			}
-
-			res.status(200).json(review);
-		} catch (error) {
-			res.status(400).json({
-				codigoErro: "ERRO_CAMPOS_INVALIDOS",
-				dadosErro: error.mapped(),
-			});
-		}
-	}
-);*/
 
 router.post(
 	"/",
@@ -97,6 +87,56 @@ router.post(
 		try {
 			result.throw();
 			reviewController.addReview(req, res);
+		} catch (error) {
+			res.status(400).json({
+				codigoErro: "ERRO_CAMPOS_INVALIDOS",
+				dadosErro: error.mapped(),
+			});
+		}
+	}
+);
+
+router.post(
+	"/like/:id",
+	verifyToken,
+	check("id")
+		.exists()
+		.withMessage("ID não pode ser nulo!")
+		.isInt()
+		.withMessage("ID deve ser um número inteiro!")
+		.custom((id) => id > 0)
+		.withMessage("ID não pode ser negativo!"),
+	async (req, res) => {
+		const result = validationResult(req).formatWith(errorsFormatter);
+		try {
+			result.throw();
+
+			await reviewController.likeReview(req, res);
+		} catch (error) {
+			res.status(400).json({
+				codigoErro: "ERRO_CAMPOS_INVALIDOS",
+				dadosErro: error.mapped(),
+			});
+		}
+	}
+);
+
+router.post(
+	"/unlike/:id",
+	verifyToken,
+	check("id")
+		.exists()
+		.withMessage("ID não pode ser nulo!")
+		.isInt()
+		.withMessage("ID deve ser um número inteiro!")
+		.custom((id) => id > 0)
+		.withMessage("ID não pode ser negativo!"),
+	async (req, res) => {
+		const result = validationResult(req).formatWith(errorsFormatter);
+		try {
+			result.throw();
+
+			await reviewController.unlikeReview(req, res);
 		} catch (error) {
 			res.status(400).json({
 				codigoErro: "ERRO_CAMPOS_INVALIDOS",

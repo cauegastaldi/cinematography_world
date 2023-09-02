@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Button, Card } from "react-bootstrap";
+import { Card } from "react-bootstrap";
 import styles from "../../styles/Review/UserReview.module.css";
 import UserService from "../../api/UserService";
 import ReactStars from "react-rating-stars-component";
@@ -12,6 +12,7 @@ const UserReview = ({ review, media, loadData }) => {
 	const loggedUser = auth.user;
 	const [reviewUser, setReviewUser] = useState(null);
 	const [modalShow, setModalShow] = useState(false);
+	const [userLikedReview, setUserLikedReview] = useState(false);
 
 	const findUser = async () => {
 		const reviewUser = await UserService.findUserById(review.userId);
@@ -19,13 +20,38 @@ const UserReview = ({ review, media, loadData }) => {
 		setReviewUser({ id: reviewUser.id, username: reviewUser.username });
 	};
 
+	const hasUserLikedReview = async () => {
+		const response = await ReviewService.findUsersWhoLikedReview(review.id);
+		const loggedUserId = loggedUser.userId;
+		let findUser = null;
+		if (!response.errors) {
+			findUser = response.find((userId) => {
+				return userId === loggedUserId;
+			});
+			setUserLikedReview(findUser != null);
+		}
+	};
+
 	const handleReviewDeletion = async (id) => {
 		await ReviewService.removeReview(id);
 		loadData();
 	};
 
+	const handleReviewLike = async (id) => {
+		await ReviewService.likeReview(id);
+		loadData();
+		hasUserLikedReview();
+	};
+
+	const handleReviewUnlike = async (id) => {
+		await ReviewService.unlikeReview(id);
+		loadData();
+		hasUserLikedReview();
+	};
+
 	useEffect(() => {
 		findUser();
+		hasUserLikedReview();
 	}, []);
 
 	return (
@@ -34,9 +60,7 @@ const UserReview = ({ review, media, loadData }) => {
 				<Card.Body className={styles.body}>
 					<div>
 						<div className={styles.userDetails}>
-							<Card.Subtitle className={`mb-2`}>
-								{reviewUser?.username}{" "}
-							</Card.Subtitle>
+							<Card.Subtitle className={`mb-2`}>{reviewUser?.username}</Card.Subtitle>
 							<Card.Subtitle className={`mx-2 mb-2`}>
 								<ReactStars
 									edit={false}
@@ -45,6 +69,10 @@ const UserReview = ({ review, media, loadData }) => {
 									value={review.mediaScore}
 									size={20}
 								/>
+							</Card.Subtitle>
+							<Card.Subtitle className={`mb-2 fw-normal`}>
+								{review.likes === 1 && <small>{review.likes} curtida</small>}
+								{review.likes !== 1 && <small>{review.likes} curtidas</small>}
 							</Card.Subtitle>
 						</div>
 
@@ -65,10 +93,27 @@ const UserReview = ({ review, media, loadData }) => {
 					)}
 					{(loggedUser?.userId === review.userId || loggedUser?.userType === "ADMIN") && (
 						<Card.Link
-							className={`${styles.link} mx-1`}
+							className={`${styles.link} mx-2`}
 							onClick={() => handleReviewDeletion(review.id)}
 						>
 							<i class="bi bi-trash3" /> Excluir
+						</Card.Link>
+					)}
+
+					{loggedUser != null && userLikedReview === true && (
+						<Card.Link
+							className={`${styles.link} mx-2`}
+							onClick={() => handleReviewUnlike(review.id)}
+						>
+							<i class="bi bi-heart-fill"></i> Curtir
+						</Card.Link>
+					)}
+					{loggedUser != null && userLikedReview === false && (
+						<Card.Link
+							className={`${styles.link} mx-2`}
+							onClick={() => handleReviewLike(review.id)}
+						>
+							<i class="bi bi-heart"></i> Curtir
 						</Card.Link>
 					)}
 				</Card.Footer>

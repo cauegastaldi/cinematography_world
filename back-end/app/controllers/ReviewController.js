@@ -1,4 +1,5 @@
 import Review from "../modules/Review";
+import UserLikeReview from "../modules/UserLikeReview";
 import CinematographyMediaController from "./CinematographyMediaController";
 import UserController from "./UserController";
 
@@ -73,7 +74,7 @@ async function updateReview(req, res) {
 		});
 	}
 
-	if (req.userId != review.userId) {
+	if (req.userId !== review.userId) {
 		return res.status(400).json({
 			errorCode: "ERRO_USUARIO_NAO_AUTORIZADO",
 			errorData: `Esta análise pertence a outro usuário!`,
@@ -106,6 +107,89 @@ async function deleteReview(req, res) {
 	return res.status(200).send({ msg: "Análise deletada com sucesso!" });
 }
 
+async function likeReview(req, res) {
+	const review = await Review.findByPk(req.params.id);
+	const user = await UserController.findUserById(req.userId);
+
+	if (review == null) {
+		return res.status(400).json({
+			errorCode: "ERRO_ANALISE_NAO_ENCONTRADA",
+			errorData: `Análise de id = ${req.params.id} não encontrada! Por favor, informe uma análise existente.`,
+		});
+	}
+
+	if (user == null) {
+		return res.status(400).json({
+			errorCode: "ERRO_USUARIO_NAO_EXISTENTE",
+			errorData: `Usuário não existente! Por favor, informe um usuário existente.`,
+		});
+	}
+
+	review.likes = review.likes + 1;
+
+	await review.save();
+
+	await UserLikeReview.create({
+		userId: req.userId,
+		reviewId: review.id,
+	});
+
+	res.sendStatus(200);
+}
+
+async function unlikeReview(req, res) {
+	const review = await Review.findByPk(req.params.id);
+	const user = await UserController.findUserById(req.userId);
+
+	if (review == null) {
+		return res.status(400).json({
+			errorCode: "ERRO_ANALISE_NAO_ENCONTRADA",
+			errorData: `Análise de id = ${req.params.id} não encontrada! Por favor, informe uma análise existente.`,
+		});
+	}
+
+	if (user == null) {
+		return res.status(400).json({
+			errorCode: "ERRO_USUARIO_NAO_EXISTENTE",
+			errorData: `Usuário não existente! Por favor, informe um usuário existente.`,
+		});
+	}
+
+	const userLikeReview = await UserLikeReview.findOne({
+		where: {
+			reviewId: review.id,
+			userId: user.id,
+		},
+	});
+
+	if (userLikeReview === null) {
+		return res.status(400).json({
+			errorCode: "ERRO_CURTIDA_NAO_EXISTENTE",
+			errorData: `Usuário não curtiu a análise especificada!`,
+		});
+	}
+
+	review.likes = review.likes - 1;
+
+	await review.save();
+	await userLikeReview.destroy();
+
+	return res.sendStatus(200);
+}
+
+async function findUsersWhoLiked(reviewId, res) {
+	let result = await UserLikeReview.findAll({
+		where: {
+			reviewId: reviewId,
+		},
+	});
+	result = result.map((userLikeReview) => {
+		return userLikeReview.dataValues.userId;
+	});
+
+	res.status(200).json(result);
+}
+
 export default {
 	findAll,
 	findReviewById,
@@ -113,4 +197,7 @@ export default {
 	addReview,
 	updateReview,
 	deleteReview,
+	likeReview,
+	unlikeReview,
+	findUsersWhoLiked,
 };
