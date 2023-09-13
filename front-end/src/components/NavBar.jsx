@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import { Nav, NavDropdown, Navbar } from "react-bootstrap";
 import { Container } from "react-bootstrap";
 import AuthService from "../api/AuthService";
@@ -16,7 +15,6 @@ const NavBar = () => {
 	const logout = async () => {
 		await AuthService.logout();
 		auth.logout();
-		setIsUserLogged(false);
 	};
 
 	return (

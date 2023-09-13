@@ -7,7 +7,7 @@ import styles from "../../styles/HomePage/MediaCard.module.css";
 import modalStyles from "../../styles/HomePage/RemoveModal.module.css";
 import "../../styles/Modal/ModalContent.css";
 
-const MediaCard = ({ media, userType }) => {
+const MediaCard = ({ media, userType, loadData }) => {
 	const [open, setOpen] = useState(false);
 	const [show, setShow] = useState(false);
 
@@ -17,6 +17,7 @@ const MediaCard = ({ media, userType }) => {
 
 	const handleMediaDeletion = async () => {
 		await MediaService.removeMedia(media.id);
+		loadData();
 	};
 
 	return (

@@ -31,7 +31,6 @@ async function login(req, res) {
 		algorithm: "RS256",
 	});
 
-	//res.status(200).json({ auth: true, token: token });
 	res.cookie("token", token, {
 		secure: false,
 		httpOnly: true,

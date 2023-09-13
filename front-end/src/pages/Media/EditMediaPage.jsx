@@ -15,7 +15,7 @@ const EditMediaPage = () => {
 	const schema = yup.object({
 		name: yup.string().required("Por favor, insira um nome"),
 		releaseYear: yup
-			.number("Ano de lançamento deve ser um número")
+			.number()
 			.transform((value) => (Number.isNaN(value) ? null : value))
 			.positive("Ano de lançamento deve ser um número positivo")
 			.integer("Ano de lançamento deve ser um número inteiro")
@@ -27,14 +27,26 @@ const EditMediaPage = () => {
 			.required("Por favor, insira o ano de lançamento"),
 		genre: yup.string().required("Por favor, insira o(s) gênero(s)"),
 		director: yup.string().required("Por favor, insira o nome do(s) diretor(es)"),
-		mediaPoster: yup
-			.mixed()
-			.test("is-valid-type", "Por favor, envie uma imagem com um tipo válido", (file) => {
-				return (
-					file.length > 0 &&
-					FileValidator.isValidFileType(file && file[0].name.toLowerCase(), "image")
-				);
-			}),
+		mediaPoster: yup.lazy((value) => {
+			if (value.length !== 0) {
+				return yup
+					.mixed()
+					.test(
+						"is-valid-type",
+						"Por favor, envie uma imagem com um tipo válido",
+						(file) => {
+							return (
+								file.length > 0 &&
+								FileValidator.isValidFileType(
+									file && file[0].name.toLowerCase(),
+									"image"
+								)
+							);
+						}
+					);
+			}
+			return yup.mixed().notRequired();
+		}),
 	});
 
 	const form = useForm({

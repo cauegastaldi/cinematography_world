@@ -31,6 +31,7 @@ const HomePage = () => {
 								key={media.id}
 								media={media}
 								userType={userType}
+								loadData={() => loadData()}
 							/>
 						</Col>
 					);
