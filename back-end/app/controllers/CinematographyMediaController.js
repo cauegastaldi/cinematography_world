@@ -62,7 +62,15 @@ async function updateMedia(req, res) {
 
 	if (director != null) media.director = director;
 
-	if (posterPath != null) media.posterPath = posterPath;
+	if (posterPath != null) {
+		// exclui a imagem antiga da pasta "/uploads"
+		fs.unlink(resolve(__dirname, `../../public${media.posterPath}`), (err) => {
+			if (err) {
+				console.log(err);
+			}
+		});
+		media.posterPath = posterPath;
+	}
 
 	await media.save();
 
