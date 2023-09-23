@@ -79,7 +79,7 @@ const EditMediaPage = () => {
 				releaseYear: data.releaseYear,
 				genre: data.genre,
 				director: data.director,
-				posterPath: uploadResponse ? uploadResponse : media.posterPath,
+				posterPath: uploadResponse ? uploadResponse : null,
 			});
 			navigate("/");
 		}

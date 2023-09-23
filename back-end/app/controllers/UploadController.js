@@ -10,9 +10,12 @@ const uploadFilter = (req, file, cb) => {
 
 	if (acceptedTypes.includes(`${type}`)) {
 		cb(null, true);
+	} else {
+		cb(
+			`Imagens .${type} não são aceitas. Por favor, envie uma imagem com um tipo aceito.`,
+			false
+		);
 	}
-
-	cb(`Imagens .${type} não são aceitas. Por favor, envie uma imagem com um tipo aceito.`, false);
 };
 
 const uploader = multer({
