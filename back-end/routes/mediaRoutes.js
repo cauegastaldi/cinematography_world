@@ -111,11 +111,7 @@ router.put(
 		.custom((releaseYear) => releaseYear.toString().length == 4)
 		.withMessage("Ano de lançamento deve possuir 4 digitos"),
 	check("director").optional().trim().notEmpty().withMessage("Diretor não pode ser vazio!"),
-	check("posterPath")
-		.optional()
-		.trim()
-		.notEmpty()
-		.withMessage("Caminho do poster da mídia não pode ser vazio!"),
+
 	async (req, res) => {
 		const result = validationResult(req).formatWith(errorsFormatter);
 		try {

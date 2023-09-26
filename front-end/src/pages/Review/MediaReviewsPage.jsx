@@ -7,6 +7,7 @@ import ReviewService from "../../api/ReviewService";
 import UserReview from "../../components/User/UserReview";
 import styles from "../../styles/MediaReviewsPage/MediaReviewsPage.module.css";
 import noReviewsCardStyles from "../../styles/MediaReviewsPage/NoReviewsCard.module.css";
+import ReactPlayer from "react-player";
 
 const MediaReviewsPage = () => {
 	const media = useLoaderData();
@@ -69,7 +70,12 @@ const MediaReviewsPage = () => {
 						</p>
 					</div>
 				</Col>
+				<ReactPlayer
+					url={media.trailerUrl}
+					controls={true}
+				/>
 			</Row>
+
 			<Row
 				xs={2}
 				md={2}

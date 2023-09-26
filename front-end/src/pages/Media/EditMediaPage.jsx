@@ -55,6 +55,7 @@ const EditMediaPage = () => {
 			releaseYear: media ? media.releaseYear : "",
 			genre: media ? media.genre : "",
 			director: media ? media.director : "",
+			trailerUrl: media ? media.trailerUrl : "",
 		},
 		resolver: yupResolver(schema),
 	});
@@ -80,6 +81,7 @@ const EditMediaPage = () => {
 				genre: data.genre,
 				director: data.director,
 				posterPath: uploadResponse ? uploadResponse : null,
+				trailerUrl: data.trailerUrl,
 			});
 			navigate("/");
 		}
@@ -188,6 +190,17 @@ const EditMediaPage = () => {
 									<div className="invalid-feedback">
 										{errors.director && <span>{errors.director.message}</span>}
 									</div>
+								</div>
+
+								<div className="form-floating mb-3">
+									<input
+										{...register("trailerUrl")}
+										type="text"
+										className="form-control"
+										id="trailerUrl"
+										placeholder="trailerUrl"
+									/>
+									<label for="trailerUrl">URL do trailer (Opcional)</label>
 								</div>
 
 								<div className="mb-3">

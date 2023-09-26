@@ -30,17 +30,26 @@ const Media = db.define("cinematography_media", {
 		type: Sequelize.STRING,
 		allowNull: false,
 	},
+	trailerUrl: {
+		type: Sequelize.STRING,
+		allowNull: true,
+	},
 });
 
 Media.hasMany(Review, {
 	constraints: true,
 	foreignKey: "mediaId",
 	onDelete: "CASCADE",
+	hooks: true,
 });
 
 Review.belongsTo(Media, {
 	foreignKey: "mediaId",
 	as: "media",
+});
+
+Media.beforeDestroy(async (media) => {
+	await Review.destroy({ where: { mediaId: media.id } });
 });
 
 export default Media;

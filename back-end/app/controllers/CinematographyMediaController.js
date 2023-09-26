@@ -28,6 +28,7 @@ function addMedia(req, res) {
 		genre: req.body.genre,
 		director: req.body.director,
 		posterPath: req.body.posterPath,
+		trailerUrl: req.body.trailerUrl.trim(),
 	}).then((result) => res.status(200).json(result));
 }
 
@@ -53,6 +54,7 @@ async function updateMedia(req, res) {
 	const genre = req.body.genre;
 	const director = req.body.director;
 	const posterPath = req.body.posterPath;
+	const trailerUrl = req.body.trailerUrl.trim();
 
 	if (name != null) media.name = name;
 
@@ -71,6 +73,8 @@ async function updateMedia(req, res) {
 		});
 		media.posterPath = posterPath;
 	}
+
+	media.trailerUrl = trailerUrl;
 
 	await media.save();
 
