@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
-import { Card } from "react-bootstrap";
+import { Accordion, Card, useAccordionButton } from "react-bootstrap";
 import styles from "../../styles/Review/UserReview.module.css";
 import UserService from "../../api/UserService";
 import ReactStars from "react-rating-stars-component";
 import ReviewModal from "../Review/ReviewModal";
 import ReviewService from "../../api/ReviewService";
 import { useAuth } from "../../hooks/useAuth";
+import ReviewCommentModal from "../Review/ReviewCommentModal";
+import ReviewComment from "./ReviewComment";
 
 const UserReview = ({ review, media, loadData }) => {
 	const auth = useAuth();
@@ -13,11 +15,18 @@ const UserReview = ({ review, media, loadData }) => {
 	const [reviewUser, setReviewUser] = useState(null);
 	const [modalShow, setModalShow] = useState(false);
 	const [userLikedReview, setUserLikedReview] = useState(false);
+	const [openComments, setCommentsOpen] = useState(false);
+	const [reviewComments, setReviewComments] = useState([]);
+	const [commentModalShow, setCommentModalShow] = useState(false);
 
 	const findUser = async () => {
 		const reviewUser = await UserService.findUserById(review.userId);
 
 		setReviewUser({ id: reviewUser.id, username: reviewUser.username });
+	};
+
+	const findReviewComments = async () => {
+		await ReviewService.findReviewComments(review.id, setReviewComments);
 	};
 
 	const hasUserLikedReview = async () => {
@@ -49,9 +58,19 @@ const UserReview = ({ review, media, loadData }) => {
 		hasUserLikedReview();
 	};
 
+	const loadComments = async () => {
+		findReviewComments();
+	};
+
+	const handleReviewCommentDeletion = async (id) => {
+		await ReviewService.removeReviewComment(id);
+		findReviewComments();
+	};
+
 	useEffect(() => {
 		findUser();
 		hasUserLikedReview();
+		loadComments();
 	}, []);
 
 	return (
@@ -116,8 +135,58 @@ const UserReview = ({ review, media, loadData }) => {
 							<i class="bi bi-heart"></i> Curtir
 						</Card.Link>
 					)}
+					{!openComments && (
+						<Card.Link
+							className={`${styles.link} mx-2`}
+							onClick={() => {
+								setCommentsOpen(true);
+							}}
+						>
+							<i class="bi bi-chat"></i> Comentários ({reviewComments?.length})
+						</Card.Link>
+					)}
+					{openComments && (
+						<>
+							<Card.Link
+								className={`${styles.link} mx-2`}
+								onClick={() => {
+									setCommentsOpen(false);
+								}}
+							>
+								<i class="bi bi-chat"></i> Comentários ({reviewComments?.length})
+							</Card.Link>
+						</>
+					)}
+					{loggedUser != null && (
+						<Card.Link
+							className={`${styles.link} mx-2`}
+							onClick={() => {
+								setCommentModalShow(true);
+							}}
+						>
+							<i class="bi bi-chat-dots"></i> Comentar
+						</Card.Link>
+					)}
 				</Card.Footer>
 			</Card>
+
+			<div className={styles.commentsContainer}>
+				{openComments === true &&
+					reviewComments.map((reviewComment) => {
+						return (
+							<ReviewComment
+								reviewComment={reviewComment}
+								loggedUser={loggedUser}
+								review={review}
+								reviewUser={reviewUser}
+								handleReviewCommentDeletion={() =>
+									handleReviewCommentDeletion(reviewComment.id)
+								}
+								loadData={() => findReviewComments()}
+							/>
+						);
+					})}
+			</div>
 
 			<ReviewModal
 				show={modalShow}
@@ -125,6 +194,15 @@ const UserReview = ({ review, media, loadData }) => {
 				media={media}
 				review={review}
 				loadData={loadData}
+			/>
+			<ReviewCommentModal
+				show={commentModalShow}
+				onHide={() => {
+					setCommentModalShow(false);
+				}}
+				review={review}
+				reviewUser={reviewUser?.username}
+				loadData={() => findReviewComments()}
 			/>
 		</>
 	);

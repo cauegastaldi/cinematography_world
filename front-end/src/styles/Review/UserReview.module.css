@@ -50,3 +50,7 @@
 	text-transform: uppercase;
 	font-weight: bold;
 }
+
+.commentsContainer {
+	padding-left: 5.5em;
+}

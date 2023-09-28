@@ -1,26 +1,25 @@
 import { Button, Col, Container, Form, Modal, Row } from "react-bootstrap";
 import "../../styles/Modal/ModalContent.css";
-import styles from "../../styles/Modal/MediaReviewModal.module.css";
-import { useEffect, useState } from "react";
+import styles from "../../styles/Modal/ReviewCommentModal.module.css";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import ReactStars from "react-rating-stars-component";
 import ReviewService from "../../api/ReviewService";
+import { useEffect } from "react";
 
-const ReviewModal = (props) => {
-	const [media, setMedia] = useState(null);
+const ReviewCommentModal = (props) => {
+	const reviewComment = props.reviewComment;
 	const review = props.review;
-	const [rating, setRating] = useState(review ? review.mediaScore : 0);
+	const reviewUser = props.reviewUser;
 
 	const schema = yup.object({
-		comment: yup.string().required("Por favor, digite a sua análise"),
+		comment: yup.string().required("Por favor, digite o seu comentário"),
 	});
 
 	const form = useForm({
 		resolver: yupResolver(schema),
 		defaultValues: {
-			comment: review ? review.comment : "",
+			comment: reviewComment?.comment,
 		},
 	});
 
@@ -30,26 +29,24 @@ const ReviewModal = (props) => {
 	const closeModal = () => {
 		reset();
 
-		setRating(review ? review.mediaScore : 0);
 		props.onHide();
 	};
 
+	useEffect(() => {
+		console.log(reviewComment);
+	});
 	const onSubmit = async (data) => {
 		const comment = data.comment;
-		const mediaId = media.id;
+
 		try {
 			let response;
-			if (review) {
-				response = await ReviewService.updateReview(review.id, {
+			if (reviewComment) {
+				response = await ReviewService.updateReviewComment(reviewComment.id, {
 					comment: comment,
-					mediaScore: rating,
-					mediaId: mediaId,
 				});
 			} else {
-				response = await ReviewService.createReview({
+				response = await ReviewService.commentReview(review.id, {
 					comment: comment,
-					mediaScore: rating,
-					mediaId: mediaId,
 				});
 			}
 			if (response.errors) {
@@ -63,10 +60,6 @@ const ReviewModal = (props) => {
 		}
 	};
 
-	useEffect(() => {
-		setMedia(props.media);
-	});
-
 	return (
 		<Modal
 			{...props}
@@ -75,18 +68,25 @@ const ReviewModal = (props) => {
 			centered
 		>
 			<Container>
+				<button
+					type="button"
+					className={`btn-close btn-close-white ${styles.closeBtn}`}
+					data-bs-dismiss="modal"
+					aria-label="Close"
+					onClick={props.onHide}
+				/>
 				<Modal.Header className={styles.modalHeader}>
-					<span>
-						{media?.name} ({media?.releaseYear})
-					</span>
-
-					<button
-						type="button"
-						className="btn-close btn-close-white"
-						data-bs-dismiss="modal"
-						aria-label="Close"
-						onClick={props.onHide}
-					></button>
+					<Row>
+						<Col
+							xs={12}
+							className={`mb-2 ${styles.username}`}
+						>
+							<span>{reviewUser}</span>
+						</Col>
+						<Col>
+							<span>{review.comment}</span>
+						</Col>
+					</Row>
 				</Modal.Header>
 
 				<Form
@@ -123,31 +123,12 @@ const ReviewModal = (props) => {
 										className={`${styles.reviewComment} ${
 											errors.comment ? "is-invalid" : ""
 										} ${errors.comment && styles.textAreaError}`}
-										placeholder="Digite a sua análise"
+										placeholder="Digite o seu comentário"
 									/>
 
 									<div className={`invalid-feedback ${styles.error}`}>
 										{errors.comment && <span>{errors.comment.message}</span>}
 									</div>
-								</Form.Group>
-
-								<Form.Group
-									controlId="rating"
-									style={{ width: "15em" }}
-								>
-									<Form.Label>
-										Nota da Mídia <small>{rating} de 5</small>
-									</Form.Label>
-
-									<ReactStars
-										count={5}
-										size={40}
-										isHalf
-										onChange={(e) => {
-											setRating(e);
-										}}
-										value={review?.mediaScore}
-									/>
 								</Form.Group>
 							</Col>
 						</Row>
@@ -173,4 +154,4 @@ const ReviewModal = (props) => {
 	);
 };
 
-export default ReviewModal;
+export default ReviewCommentModal;

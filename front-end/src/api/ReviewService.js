@@ -46,6 +46,27 @@ const findReviewById = async (id, setReview) => {
 	return response;
 };
 
+const findReviewComments = async (reviewId, setReviewComments) => {
+	const response = axios
+		.get(`${baseUrl}/reviewComments/${reviewId}`)
+		.then((response) => {
+			setReviewComments(response.data);
+		})
+		.catch((error) => {
+			if (error.response) {
+				return { error: error.response.data };
+			} else if (error.request) {
+				console.error(error.request);
+				return {};
+			} else {
+				console.error(error.message);
+				return {};
+			}
+		});
+
+	return response;
+};
+
 const updateReview = async (id, data) => {
 	const response = await axios
 		.put(`${baseUrl}/${id}`, data, { withCredentials: true })
@@ -138,6 +159,117 @@ const findUsersWhoLikedReview = async (id) => {
 	return response;
 };
 
+const commentReview = async (id, data) => {
+	const response = await axios
+		.post(`${baseUrl}/commentReview/${id}`, data, { withCredentials: true })
+		.catch((error) => {
+			if (error.response) {
+				return { error: error.response.data };
+			} else if (error.request) {
+				console.error(error.request);
+				return {};
+			} else {
+				console.error(error.message);
+				return {};
+			}
+		});
+
+	return response;
+};
+
+const updateReviewComment = async (id, data) => {
+	const response = await axios
+		.put(`${baseUrl}/reviewComment/${id}`, data, { withCredentials: true })
+		.catch((error) => {
+			if (error.response) {
+				return { error: error.response.data };
+			} else if (error.request) {
+				console.error(error.request);
+				return {};
+			} else {
+				console.error(error.message);
+				return {};
+			}
+		});
+
+	return response;
+};
+
+const removeReviewComment = async (id) => {
+	const response = await axios
+		.delete(`${baseUrl}/reviewComment/${id}`, { withCredentials: true })
+		.catch((error) => {
+			if (error.response) {
+				return { error: error.response.data };
+			} else if (error.request) {
+				console.error(error.request);
+				return {};
+			} else {
+				console.error(error.message);
+				return {};
+			}
+		});
+
+	return response;
+};
+
+const likeReviewComment = async (id) => {
+	const response = await axios
+		.post(`${baseUrl}/reviewComment/like/${id}`, null, { withCredentials: true })
+		.catch((error) => {
+			if (error.response) {
+				return { error: error.response.data };
+			} else if (error.request) {
+				console.error(error.request);
+				return {};
+			} else {
+				console.error(error.message);
+				return {};
+			}
+		});
+
+	return response;
+};
+
+const unlikeReviewComment = async (id) => {
+	const response = await axios
+		.post(`${baseUrl}/reviewComment/unlike/${id}`, null, { withCredentials: true })
+		.catch((error) => {
+			if (error.response) {
+				return { error: error.response.data };
+			} else if (error.request) {
+				console.error(error.request);
+				return {};
+			} else {
+				console.error(error.message);
+				return {};
+			}
+		});
+
+	return response;
+};
+
+const findUsersWhoLikedReviewComment = async (id) => {
+	const response = await axios
+		.get(`${baseUrl}/reviewComment/likes/${id}`)
+		.then((response) => {
+			return response.data;
+		})
+		.catch((error) => {
+			if (error.response) {
+				return { error: error.response.data };
+			} else if (error.request) {
+				console.error(error.request);
+				return {};
+			} else {
+				console.error(error.message);
+				return {};
+			}
+		});
+
+	return response;
+};
+
 export default {
 	createReview,
 	updateReview,
@@ -147,4 +279,11 @@ export default {
 	likeReview,
 	unlikeReview,
 	findUsersWhoLikedReview,
+	commentReview,
+	removeReviewComment,
+	updateReviewComment,
+	findReviewComments,
+	likeReviewComment,
+	unlikeReviewComment,
+	findUsersWhoLikedReviewComment,
 };

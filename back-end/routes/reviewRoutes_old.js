@@ -2,7 +2,6 @@ import express from "express";
 import reviewController from "../app/controllers/ReviewController";
 import { check, validationResult } from "express-validator";
 import verifyToken from "../app/middlewares/verifyToken";
-import ReviewCommentController from "../app/controllers/ReviewCommentController";
 
 const errorsFormatter = ({ msg }) => {
 	return `${msg}`;
@@ -11,6 +10,52 @@ const errorsFormatter = ({ msg }) => {
 const router = express.Router();
 
 router.get("/", reviewController.findAll);
+
+router.get(
+	"/reviewComments/:id",
+	check("id")
+		.exists()
+		.withMessage("ID não pode ser nulo!")
+		.isInt()
+		.withMessage("ID deve ser um número inteiro!")
+		.custom((id) => id > 0)
+		.withMessage("ID não pode ser negativo!"),
+	async (req, res) => {
+		const result = validationResult(req).formatWith(errorsFormatter);
+		try {
+			result.throw();
+			reviewController.findCommentsOfReview(req.params.id, res);
+		} catch (error) {
+			res.status(400).json({
+				codigoErro: "ERRO_CAMPOS_INVALIDOS",
+				dadosErro: error.mapped(),
+			});
+		}
+	}
+);
+
+router.get(
+	"/reviewComment/likes/:reviewCommentId",
+	check("reviewCommentId")
+		.exists()
+		.withMessage("ID não pode ser nulo!")
+		.isInt()
+		.withMessage("ID deve ser um número inteiro!")
+		.custom((id) => id > 0)
+		.withMessage("ID não pode ser negativo!"),
+	async (req, res) => {
+		const result = validationResult(req).formatWith(errorsFormatter);
+		try {
+			result.throw();
+			reviewController.findUsersWhoLiked(req.params.reviewCommentId, res);
+		} catch (error) {
+			res.status(400).json({
+				codigoErro: "ERRO_CAMPOS_INVALIDOS",
+				dadosErro: error.mapped(),
+			});
+		}
+	}
+);
 
 router.get(
 	"/likes/:reviewId",
@@ -25,7 +70,7 @@ router.get(
 		const result = validationResult(req).formatWith(errorsFormatter);
 		try {
 			result.throw();
-			reviewController.findUsersWhoLiked(req.params.reviewId, res);
+			reviewController.findUsersWhoLikedComment(req.params.reviewId, res);
 		} catch (error) {
 			res.status(400).json({
 				codigoErro: "ERRO_CAMPOS_INVALIDOS",
@@ -98,6 +143,37 @@ router.post(
 );
 
 router.post(
+	"/commentReview/:id",
+	verifyToken,
+	check("id")
+		.exists()
+		.withMessage("ID não pode ser nulo!")
+		.isInt()
+		.withMessage("ID deve ser um número inteiro!")
+		.custom((id) => id > 0)
+		.withMessage("ID não pode ser negativo!"),
+	check("comment")
+		.exists()
+		.withMessage("Comentário não pode ser nulo!")
+		.trim()
+		.notEmpty()
+		.withMessage("Comentário não pode ser vazio!"),
+
+	async (req, res) => {
+		const result = validationResult(req).formatWith(errorsFormatter);
+		try {
+			result.throw();
+			reviewController.commentReview(req, res);
+		} catch (error) {
+			res.status(400).json({
+				codigoErro: "ERRO_CAMPOS_INVALIDOS",
+				dadosErro: error.mapped(),
+			});
+		}
+	}
+);
+
+router.post(
 	"/like/:id",
 	verifyToken,
 	check("id")
@@ -111,7 +187,6 @@ router.post(
 		const result = validationResult(req).formatWith(errorsFormatter);
 		try {
 			result.throw();
-
 			await reviewController.likeReview(req, res);
 		} catch (error) {
 			res.status(400).json({
@@ -147,6 +222,56 @@ router.post(
 	}
 );
 
+router.post(
+	"/reviewComment/like/:id",
+	verifyToken,
+	check("id")
+		.exists()
+		.withMessage("ID não pode ser nulo!")
+		.isInt()
+		.withMessage("ID deve ser um número inteiro!")
+		.custom((id) => id > 0)
+		.withMessage("ID não pode ser negativo!"),
+	async (req, res) => {
+		const result = validationResult(req).formatWith(errorsFormatter);
+		try {
+			result.throw();
+
+			await reviewController.likeReviewComment(req, res);
+		} catch (error) {
+			res.status(400).json({
+				codigoErro: "ERRO_CAMPOS_INVALIDOS",
+				dadosErro: error.mapped(),
+			});
+		}
+	}
+);
+
+router.post(
+	"/reviewComment/unlike/:id",
+	verifyToken,
+	check("id")
+		.exists()
+		.withMessage("ID não pode ser nulo!")
+		.isInt()
+		.withMessage("ID deve ser um número inteiro!")
+		.custom((id) => id > 0)
+		.withMessage("ID não pode ser negativo!"),
+	async (req, res) => {
+		const result = validationResult(req).formatWith(errorsFormatter);
+		try {
+			result.throw();
+
+			await reviewController.unlikeReviewComment(req, res);
+		} catch (error) {
+			res.status(400).json({
+				codigoErro: "ERRO_CAMPOS_INVALIDOS",
+				dadosErro: error.mapped(),
+			});
+		}
+	}
+);
+
 router.put(
 	"/:id",
 	verifyToken,
@@ -164,6 +289,24 @@ router.put(
 		try {
 			result.throw();
 			reviewController.updateReview(req, res);
+		} catch (error) {
+			res.status(400).json({
+				codigoErro: "ERRO_CAMPOS_INVALIDOS",
+				dadosErro: error.mapped(),
+			});
+		}
+	}
+);
+
+router.put(
+	"/reviewComment/:id",
+	verifyToken,
+	check("comment").optional().trim().notEmpty().withMessage("Comentário não pode ser vazio!"),
+	async (req, res) => {
+		const result = validationResult(req).formatWith(errorsFormatter);
+		try {
+			result.throw();
+			reviewController.updateReviewComment(req, res);
 		} catch (error) {
 			res.status(400).json({
 				codigoErro: "ERRO_CAMPOS_INVALIDOS",
@@ -197,151 +340,6 @@ router.delete(
 	}
 );
 
-router.get(
-	"/reviewComments/:id",
-	check("id")
-		.exists()
-		.withMessage("ID não pode ser nulo!")
-		.isInt()
-		.withMessage("ID deve ser um número inteiro!")
-		.custom((id) => id > 0)
-		.withMessage("ID não pode ser negativo!"),
-	async (req, res) => {
-		const result = validationResult(req).formatWith(errorsFormatter);
-		try {
-			result.throw();
-			ReviewCommentController.findCommentsOfReview(req.params.id, res);
-		} catch (error) {
-			res.status(400).json({
-				codigoErro: "ERRO_CAMPOS_INVALIDOS",
-				dadosErro: error.mapped(),
-			});
-		}
-	}
-);
-
-router.get(
-	"/reviewComment/likes/:reviewCommentId",
-	check("reviewCommentId")
-		.exists()
-		.withMessage("ID não pode ser nulo!")
-		.isInt()
-		.withMessage("ID deve ser um número inteiro!")
-		.custom((id) => id > 0)
-		.withMessage("ID não pode ser negativo!"),
-	async (req, res) => {
-		const result = validationResult(req).formatWith(errorsFormatter);
-		try {
-			result.throw();
-			ReviewCommentController.findUsersWhoLikedComment(req.params.reviewCommentId, res);
-		} catch (error) {
-			res.status(400).json({
-				codigoErro: "ERRO_CAMPOS_INVALIDOS",
-				dadosErro: error.mapped(),
-			});
-		}
-	}
-);
-
-router.post(
-	"/commentReview/:id",
-	verifyToken,
-	check("id")
-		.exists()
-		.withMessage("ID não pode ser nulo!")
-		.isInt()
-		.withMessage("ID deve ser um número inteiro!")
-		.custom((id) => id > 0)
-		.withMessage("ID não pode ser negativo!"),
-	check("comment")
-		.exists()
-		.withMessage("Comentário não pode ser nulo!")
-		.trim()
-		.notEmpty()
-		.withMessage("Comentário não pode ser vazio!"),
-
-	async (req, res) => {
-		const result = validationResult(req).formatWith(errorsFormatter);
-		try {
-			result.throw();
-			ReviewCommentController.commentReview(req, res);
-		} catch (error) {
-			res.status(400).json({
-				codigoErro: "ERRO_CAMPOS_INVALIDOS",
-				dadosErro: error.mapped(),
-			});
-		}
-	}
-);
-
-router.post(
-	"/reviewComment/like/:id",
-	verifyToken,
-	check("id")
-		.exists()
-		.withMessage("ID não pode ser nulo!")
-		.isInt()
-		.withMessage("ID deve ser um número inteiro!")
-		.custom((id) => id > 0)
-		.withMessage("ID não pode ser negativo!"),
-	async (req, res) => {
-		const result = validationResult(req).formatWith(errorsFormatter);
-		try {
-			result.throw();
-
-			await ReviewCommentController.likeReviewComment(req, res);
-		} catch (error) {
-			res.status(400).json({
-				codigoErro: "ERRO_CAMPOS_INVALIDOS",
-				dadosErro: error.mapped(),
-			});
-		}
-	}
-);
-
-router.post(
-	"/reviewComment/unlike/:id",
-	verifyToken,
-	check("id")
-		.exists()
-		.withMessage("ID não pode ser nulo!")
-		.isInt()
-		.withMessage("ID deve ser um número inteiro!")
-		.custom((id) => id > 0)
-		.withMessage("ID não pode ser negativo!"),
-	async (req, res) => {
-		const result = validationResult(req).formatWith(errorsFormatter);
-		try {
-			result.throw();
-
-			await ReviewCommentController.unlikeReviewComment(req, res);
-		} catch (error) {
-			res.status(400).json({
-				codigoErro: "ERRO_CAMPOS_INVALIDOS",
-				dadosErro: error.mapped(),
-			});
-		}
-	}
-);
-
-router.put(
-	"/reviewComment/:id",
-	verifyToken,
-	check("comment").optional().trim().notEmpty().withMessage("Comentário não pode ser vazio!"),
-	async (req, res) => {
-		const result = validationResult(req).formatWith(errorsFormatter);
-		try {
-			result.throw();
-			ReviewCommentController.updateReviewComment(req, res);
-		} catch (error) {
-			res.status(400).json({
-				codigoErro: "ERRO_CAMPOS_INVALIDOS",
-				dadosErro: error.mapped(),
-			});
-		}
-	}
-);
-
 router.delete(
 	"/reviewComment/:id",
 	verifyToken,
@@ -356,30 +354,7 @@ router.delete(
 		const result = validationResult(req).formatWith(errorsFormatter);
 		try {
 			result.throw();
-			ReviewCommentController.deleteReviewComment(req, res);
-		} catch (error) {
-			res.status(400).json({
-				codigoErro: "ERRO_CAMPOS_INVALIDOS",
-				dadosErro: error.mapped(),
-			});
-		}
-	}
-);
-
-router.get(
-	"/reviewComment/likes/:commentId",
-	check("commentId")
-		.exists()
-		.withMessage("ID não pode ser nulo!")
-		.isInt()
-		.withMessage("ID deve ser um número inteiro!")
-		.custom((id) => id > 0)
-		.withMessage("ID não pode ser negativo!"),
-	async (req, res) => {
-		const result = validationResult(req).formatWith(errorsFormatter);
-		try {
-			result.throw();
-			ReviewCommentController.findUsersWhoLikedComment(req.params.commentId, res);
+			reviewController.deleteReviewComment(req, res);
 		} catch (error) {
 			res.status(400).json({
 				codigoErro: "ERRO_CAMPOS_INVALIDOS",

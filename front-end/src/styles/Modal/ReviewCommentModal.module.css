@@ -1,0 +1,63 @@
+.username {
+	color: whitesmoke;
+	font-weight: 600;
+}
+
+.modalHeader {
+	border: 0;
+}
+
+.modalHeader span {
+	font-size: 1.2em;
+}
+
+.modalBody {
+	border: 0;
+}
+
+.modalHeader,
+.modalBody {
+	padding-left: 20px;
+}
+
+.modalFooter {
+	border: 0;
+	font-size: 1.15em;
+	padding-right: 0;
+}
+
+.reviewComment {
+	height: 100px;
+	min-width: 450px;
+	max-width: 450px;
+	box-shadow: none;
+	border: 0;
+}
+
+.reviewComment:focus {
+	height: 200px;
+	box-shadow: none;
+}
+
+.modalBtn {
+	font-size: 0.8em;
+	letter-spacing: 0.05rem;
+	padding: 0.75rem 1rem;
+	text-transform: uppercase;
+	font-weight: bold;
+}
+
+.textAreaError {
+	box-shadow: none !important;
+}
+
+.error {
+	width: 15em;
+	color: #cf6679;
+}
+
+.closeBtn {
+	position: absolute;
+	right: 4px;
+	top: 1em;
+}

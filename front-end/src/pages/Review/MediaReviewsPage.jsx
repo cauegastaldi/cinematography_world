@@ -70,10 +70,12 @@ const MediaReviewsPage = () => {
 						</p>
 					</div>
 				</Col>
-				<ReactPlayer
-					url={media.trailerUrl}
-					controls={true}
-				/>
+				{media.trailerUrl && (
+					<ReactPlayer
+						url={media.trailerUrl}
+						controls={true}
+					/>
+				)}
 			</Row>
 
 			<Row

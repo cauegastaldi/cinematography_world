@@ -1,8 +1,9 @@
-import { Col, Row } from "react-bootstrap";
+import { Col, Form, Row } from "react-bootstrap";
 import MediaCard from "../components/Media/MediaCard";
 import { useAuth } from "../hooks/useAuth";
 import { useEffect, useState } from "react";
 import MediaService from "../api/MediaService";
+import styles from "../styles/HomePage/HomePage.module.css";
 
 const HomePage = () => {
 	const auth = useAuth();
@@ -13,12 +14,35 @@ const HomePage = () => {
 		MediaService.findAllMedias(setMedias);
 	};
 
+	const searchMedia = (mediaName) => {
+		if (mediaName === "") {
+			loadData();
+		} else {
+			const regex = new RegExp(`^${mediaName}`);
+
+			const foundMedias = medias.filter((media) => {
+				return regex.test(media.name.toLowerCase());
+			});
+
+			setMedias(foundMedias);
+		}
+	};
+
 	useEffect(() => {
 		loadData();
 	}, []);
 
 	return (
 		<>
+			<Form.Group>
+				<Form.Control
+					type="text"
+					placeholder="Buscar mídia"
+					className={`mr-sm-2 ${styles.searchBar}`}
+					onChange={(e) => searchMedia(e.target.value.trim())}
+				/>
+			</Form.Group>
+
 			<Row className="gy-3 my-2">
 				{medias.map((media) => {
 					return (
