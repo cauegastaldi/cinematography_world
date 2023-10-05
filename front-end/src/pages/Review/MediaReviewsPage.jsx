@@ -1,5 +1,5 @@
 import { useLoaderData } from "react-router-dom";
-import { Badge, Button, Card, Col, Image, Row } from "react-bootstrap";
+import { Badge, Button, Card, Col, Image, OverlayTrigger, Row, Tooltip } from "react-bootstrap";
 import ReviewModal from "../../components/Review/ReviewModal";
 import { useEffect, useState } from "react";
 import { useAuth } from "../../hooks/useAuth";
@@ -8,6 +8,25 @@ import UserReview from "../../components/User/UserReview";
 import styles from "../../styles/MediaReviewsPage/MediaReviewsPage.module.css";
 import noReviewsCardStyles from "../../styles/MediaReviewsPage/NoReviewsCard.module.css";
 import ReactPlayer from "react-player";
+import MediaService from "../../api/MediaService";
+
+const renderTooltip = (props) => (
+	/*
+	<Tooltip
+		id="button-tooltip"
+		className={styles.tooltip}
+		{...props}
+	>
+		Favoritar
+	</Tooltip>*/
+
+	<div
+		{...props}
+		className={styles.tooltip}
+	>
+		{props.text}
+	</div>
+);
 
 const MediaReviewsPage = () => {
 	const media = useLoaderData();
@@ -16,9 +35,32 @@ const MediaReviewsPage = () => {
 	const [modalShow, setModalShow] = useState(false);
 	const [reviews, setReviews] = useState([]);
 	const [userHasReview, setUserHasReview] = useState(false);
+	const [favoritesNumber, setFavoritesNumber] = useState(0);
+	const [userFavoritedMedia, setUserFavoritedMedia] = useState(false);
 
 	const loadData = () => {
 		ReviewService.findAllMediaReviews(mediaId, setReviews);
+	};
+
+	const favoriteMedia = async (id) => {
+		await MediaService.favoriteMedia(id);
+		setUserFavoritedMedia(true);
+		setFavoritesNumber(favoritesNumber + 1);
+	};
+
+	const unfavoriteMedia = async (id) => {
+		await MediaService.unfavoriteMedia(id);
+		setFavoritesNumber(favoritesNumber - 1);
+		setUserFavoritedMedia(false);
+	};
+
+	const getFavoritesNumber = async () => {
+		const favoritedMedias = await MediaService.findAllFavoritedMedias();
+		const favoritedMedia = favoritedMedias.find((favoritedMedia) => {
+			return favoritedMedia.id === mediaId;
+		});
+
+		setFavoritesNumber(favoritedMedia ? favoritedMedia.usersWhoLiked.length : 0);
 	};
 
 	const findUserReview = () => {
@@ -30,8 +72,29 @@ const MediaReviewsPage = () => {
 		}
 	};
 
+	const checkIfUserFavorited = async () => {
+		if (user) {
+			const favoritedMedias = await MediaService.findAllFavoritedMedias();
+
+			const favoritedMedia = favoritedMedias.find((favoritedMedia) => {
+				return favoritedMedia.id === mediaId;
+			});
+
+			if (favoritedMedia != null) {
+				const hasUserFavoritedMedia = favoritedMedias.some((favoritedMedia) => {
+					return favoritedMedia.usersWhoLiked.some((userWhoLiked) => {
+						return userWhoLiked.id === user.userId;
+					});
+				});
+				setUserFavoritedMedia(hasUserFavoritedMedia);
+			}
+		}
+	};
+
 	useEffect(() => {
 		loadData();
+		getFavoritesNumber();
+		checkIfUserFavorited();
 	}, []);
 
 	useEffect(() => {
@@ -53,23 +116,75 @@ const MediaReviewsPage = () => {
 						className={`${styles.reviewMediaCard} border-0 rounded-0`}
 					>
 						<Image
-							id="image"
+							className={`${styles.image}`}
 							src={`http://localhost:8000${media.posterPath}`}
 						/>
 					</Card>
 				</Col>
-				<Col>
-					<div>
-						<h2 className={styles.mediaDetail}>
-							{media.name} ({media.releaseYear})
-						</h2>
 
-						<p className={styles.mediaDetail}>Dirigido por {media.director}</p>
-						<p className={styles.mediaDetail}>
-							Gêneros: <Badge bg="secondary">{media.genre}</Badge>
-						</p>
+				<Col>
+					<div
+						className="d-flex flex-column justify-content-between"
+						style={{ height: "100%" }}
+					>
+						<Row>
+							<div>
+								<h2 className={styles.mediaDetail}>
+									{media.name} ({media.releaseYear})
+								</h2>
+								<p className={styles.mediaDetail}>Dirigido por {media.director}</p>
+								<p className={styles.mediaDetail}>
+									Gêneros: <Badge bg="secondary">{media.genre}</Badge>
+								</p>
+							</div>
+						</Row>
+
+						<Row
+							xs={4}
+							className="mt-auto"
+						>
+							{!userFavoritedMedia && (
+								<OverlayTrigger
+									overlay={renderTooltip({ text: "Favoritar" })}
+									rootClose={true}
+									delay={{ show: 500, hide: 0 }}
+									placement="bottom"
+								>
+									<Button
+										className={`${styles.favoriteBtn}`}
+										onClick={() => favoriteMedia(mediaId)}
+									>
+										<i className={`${styles.icon} bi bi-heart`}></i>
+
+										<span className={styles.favoritesNumber}>
+											{favoritesNumber}
+										</span>
+									</Button>
+								</OverlayTrigger>
+							)}
+
+							{userFavoritedMedia && (
+								<OverlayTrigger
+									overlay={renderTooltip({ text: "Desfazer favoritar" })}
+									rootClose={true}
+									delay={{ show: 500, hide: 0 }}
+									placement="bottom"
+								>
+									<Button
+										className={`${styles.favoriteBtn} ${styles.favoritedMediaBtn}`}
+										onClick={() => unfavoriteMedia(mediaId)}
+									>
+										<i className={`${styles.icon} bi bi-heart-fill`}></i>
+										<span className={styles.favoritesNumber}>
+											{favoritesNumber}
+										</span>
+									</Button>
+								</OverlayTrigger>
+							)}
+						</Row>
 					</div>
 				</Col>
+
 				{media.trailerUrl && (
 					<ReactPlayer
 						url={media.trailerUrl}

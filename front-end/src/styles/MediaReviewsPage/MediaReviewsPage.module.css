@@ -4,6 +4,13 @@
 	overflow: hidden;
 }
 
+.image {
+	min-width: 250px;
+	min-height: 350px;
+	max-width: 250px;
+	max-height: 350px;
+}
+
 h2.mediaDetail {
 	text-transform: capitalize;
 	font-family: "Maax Bold";
@@ -31,4 +38,50 @@ p.mediaDetail {
 	padding: 0.75rem 1rem;
 	text-transform: uppercase;
 	font-weight: bold;
+}
+
+.favoriteBtn {
+	border-color: transparent;
+	background-color: transparent;
+	color: white;
+	outline: none;
+	border: 0;
+	box-shadow: none;
+	border-radius: 100%;
+	transition-property: color;
+	padding: 10px;
+}
+
+.favoriteBtn:hover {
+	background-color: #f9188141;
+	color: #f91880;
+}
+
+.favoriteBtn:active:focus {
+	background-color: transparent;
+}
+
+.favoriteBtn.favoritedMediaBtn,
+.favoriteBtn:active:focus.favoritedMediaBtn {
+	color: #f91880;
+}
+
+.icon {
+	font-size: 1.4em;
+}
+
+.favoritesNumber {
+	font-size: 1.4em;
+	font-family: "Lato";
+	padding-left: 8px;
+}
+
+.tooltip {
+	position: absolute;
+	background-color: #ffffff26;
+	padding: 2px 5px;
+	color: whitesmoke;
+	border-radius: 3px;
+	margin-top: 3px;
+	font-size: 0.9em;
 }

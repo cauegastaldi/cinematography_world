@@ -2,6 +2,8 @@ import Sequelize from "sequelize";
 
 import db from "../../database/db";
 import Review from "./Review.js";
+import User from "./User";
+import UsersFavoriteMedias from "./UserFavoriteMedias";
 
 const Media = db.define("cinematography_media", {
 	id: {
@@ -51,5 +53,20 @@ Review.belongsTo(Media, {
 Media.beforeDestroy(async (media) => {
 	await Review.destroy({ where: { mediaId: media.id } });
 });
+
+User.belongsToMany(Media, {
+	through: UsersFavoriteMedias,
+	as: "favoriteMedias",
+	foreignKey: "userId",
+});
+Media.belongsToMany(User, {
+	through: UsersFavoriteMedias,
+	as: "usersWhoLiked",
+	foreignKey: "mediaId",
+});
+User.hasMany(UsersFavoriteMedias, { foreignKey: "userId" });
+UsersFavoriteMedias.belongsTo(User, { foreignKey: "userId" });
+Media.hasMany(UsersFavoriteMedias, { foreignKey: "mediaId", as: "favoriteMedia" });
+UsersFavoriteMedias.belongsTo(Media, { foreignKey: "mediaId", as: "favoriteMedia" });
 
 export default Media;

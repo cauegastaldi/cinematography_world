@@ -30,7 +30,7 @@ const LoginPage = () => {
 		try {
 			const response = await AuthService.login(username, password);
 			if (response.errors) {
-				setError("login", { message: "Usuário ou senha inválidos" });
+				setError("login", { message: "Username ou senha inválidos" });
 			} else {
 				auth.login({
 					userId: response.userId,
@@ -66,6 +66,10 @@ const LoginPage = () => {
 												className="card-text"
 												style={{ fontSize: "0.9em" }}
 											>
+												<i
+													class="bi bi-exclamation-triangle-fill"
+													style={{ color: "#ffb400" }}
+												/>{" "}
 												{errors?.login?.message}
 											</p>
 										</div>

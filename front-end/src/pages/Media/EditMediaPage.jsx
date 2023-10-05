@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import MediaService from "../../api/MediaService";
 import FileValidator from "../../utils/FileValidator";
+import ImageResizer from "../../utils/ImageResizer";
 
 const EditMediaPage = () => {
 	const media = useLoaderData();
@@ -68,8 +69,9 @@ const EditMediaPage = () => {
 	const onSubmit = async (data) => {
 		let uploadResponse = null;
 		if (data.mediaPoster[0]) {
+			const image = await ImageResizer.resizeImage(data.mediaPoster[0]);
 			const formData = new FormData();
-			formData.append("mediaPoster", data.mediaPoster[0]);
+			formData.append("mediaPoster", image);
 			uploadResponse = await MediaService.uploadMediaPoster(formData);
 		}
 		if (uploadResponse?.errors) {

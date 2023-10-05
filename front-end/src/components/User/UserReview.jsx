@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Accordion, Card, useAccordionButton } from "react-bootstrap";
+import { Card } from "react-bootstrap";
 import styles from "../../styles/Review/UserReview.module.css";
 import UserService from "../../api/UserService";
 import ReactStars from "react-rating-stars-component";
@@ -106,7 +106,7 @@ const UserReview = ({ review, media, loadData }) => {
 								className={`${styles.link} mx-2`}
 								onClick={() => setModalShow(true)}
 							>
-								<i class="bi bi-pencil-square"></i> Editar
+								<i className="bi bi-pencil-square"></i> Editar
 							</Card.Link>
 						</>
 					)}
@@ -115,7 +115,7 @@ const UserReview = ({ review, media, loadData }) => {
 							className={`${styles.link} mx-2`}
 							onClick={() => handleReviewDeletion(review.id)}
 						>
-							<i class="bi bi-trash3" /> Excluir
+							<i className="bi bi-trash3" /> Excluir
 						</Card.Link>
 					)}
 
@@ -124,7 +124,7 @@ const UserReview = ({ review, media, loadData }) => {
 							className={`${styles.link} mx-2`}
 							onClick={() => handleReviewUnlike(review.id)}
 						>
-							<i class="bi bi-heart-fill"></i> Curtir
+							<i className="bi bi-heart-fill"></i> Curtir
 						</Card.Link>
 					)}
 					{loggedUser != null && userLikedReview === false && (
@@ -132,7 +132,7 @@ const UserReview = ({ review, media, loadData }) => {
 							className={`${styles.link} mx-2`}
 							onClick={() => handleReviewLike(review.id)}
 						>
-							<i class="bi bi-heart"></i> Curtir
+							<i className="bi bi-heart"></i> Curtir
 						</Card.Link>
 					)}
 					{!openComments && (
@@ -142,7 +142,7 @@ const UserReview = ({ review, media, loadData }) => {
 								setCommentsOpen(true);
 							}}
 						>
-							<i class="bi bi-chat"></i> Comentários ({reviewComments?.length})
+							<i className="bi bi-chat"></i> Comentários ({reviewComments?.length})
 						</Card.Link>
 					)}
 					{openComments && (
@@ -153,7 +153,8 @@ const UserReview = ({ review, media, loadData }) => {
 									setCommentsOpen(false);
 								}}
 							>
-								<i class="bi bi-chat"></i> Comentários ({reviewComments?.length})
+								<i className="bi bi-chat"></i> Comentários ({reviewComments?.length}
+								)
 							</Card.Link>
 						</>
 					)}
@@ -164,7 +165,7 @@ const UserReview = ({ review, media, loadData }) => {
 								setCommentModalShow(true);
 							}}
 						>
-							<i class="bi bi-chat-dots"></i> Comentar
+							<i className="bi bi-chat-dots"></i> Comentar
 						</Card.Link>
 					)}
 				</Card.Footer>

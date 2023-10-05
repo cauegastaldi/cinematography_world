@@ -1,20 +1,34 @@
-import { Nav, NavDropdown, Navbar } from "react-bootstrap";
+import { Button, Modal, Nav, NavDropdown, Navbar } from "react-bootstrap";
 import { Container } from "react-bootstrap";
 import AuthService from "../api/AuthService";
 
 import "../styles/NavBar.css";
+import modalStyles from "../styles/HomePage/RemoveModal.module.css";
+import "../styles/Modal/ModalContent.css";
 import { LinkContainer } from "react-router-bootstrap";
 import { useAuth } from "../hooks/useAuth";
+import { useState } from "react";
+import UserService from "../api/UserService";
 
 const NavBar = () => {
 	const auth = useAuth();
 	const user = auth.user;
+	const [show, setShow] = useState(false);
 
 	const userType = user?.userType;
 
 	const logout = async () => {
 		await AuthService.logout();
 		auth.logout();
+	};
+
+	const handleClose = () => setShow(false);
+	const handleShow = () => setShow(true);
+
+	const handleAccountDeletion = async (id) => {
+		await UserService.removeUser(id);
+		await logout();
+		handleClose();
 	};
 
 	return (
@@ -47,6 +61,11 @@ const NavBar = () => {
 								<Nav.Link className="link">Listar Usuários</Nav.Link>
 							</LinkContainer>
 						)}
+						{user && (
+							<LinkContainer to={"/user/favoritesMedias"}>
+								<Nav.Link className="link">Meus favoritos</Nav.Link>
+							</LinkContainer>
+						)}
 
 						{user && (
 							<NavDropdown
@@ -61,6 +80,10 @@ const NavBar = () => {
 								<LinkContainer to={`/user/edit/${user?.userId}/password`}>
 									<NavDropdown.Item>Alterar Senha</NavDropdown.Item>
 								</LinkContainer>
+
+								<NavDropdown.Item onClick={() => handleShow()}>
+									Excluir Conta
+								</NavDropdown.Item>
 							</NavDropdown>
 						)}
 
@@ -77,6 +100,48 @@ const NavBar = () => {
 					</Nav>
 				</Container>
 			</Navbar>
+
+			<Modal
+				show={show}
+				onHide={handleClose}
+			>
+				<Container>
+					<Modal.Header className={modalStyles.modalHeader}>
+						<Modal.Title className={modalStyles.modalTitle}>
+							Confirmar Exclusão
+						</Modal.Title>
+						<button
+							type="button"
+							className="btn-close btn-close-white"
+							data-bs-dismiss="modal"
+							aria-label="Close"
+							onClick={() => handleClose()}
+						></button>
+					</Modal.Header>
+					<Modal.Body className={modalStyles.modalBody}>
+						Tem certeza de que deseja excluir a conta? A ação não poderá ser desfeita e
+						a conta não poderá ser recuperada!
+					</Modal.Body>
+					<Modal.Footer className={modalStyles.modalFooter}>
+						<Button
+							variant="secondary"
+							onClick={handleClose}
+							className={modalStyles.modalBtn}
+						>
+							Cancelar
+						</Button>
+						<Button
+							variant="danger"
+							onClick={() => {
+								handleAccountDeletion(user?.userId);
+							}}
+							className={modalStyles.modalBtn}
+						>
+							Excluir
+						</Button>
+					</Modal.Footer>
+				</Container>
+			</Modal>
 		</>
 	);
 };

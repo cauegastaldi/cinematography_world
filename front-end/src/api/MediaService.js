@@ -39,10 +39,11 @@ const uploadMediaPoster = async (formData) => {
 	return response;
 };
 
-const findAllMedias = async (setData) => {
-	axios.get(`${baseUrl}`).then((response) => {
-		setData(response.data);
+const findAllMedias = () => {
+	const response = axios.get(`${baseUrl}`).then((response) => {
+		return response.data;
 	});
+	return response;
 };
 
 const findOneMedia = async (id) => {
@@ -98,6 +99,63 @@ const removeMedia = async (id) => {
 	return response;
 };
 
+const favoriteMedia = async (id) => {
+	const response = await axios
+		.post(`${baseUrl}/favorite/${id}`, null, { withCredentials: true })
+		.catch((error) => {
+			if (error.response) {
+				return { error: error.response.data };
+			} else if (error.request) {
+				console.error(error.request);
+				return {};
+			} else {
+				console.error(error.message);
+				return {};
+			}
+		});
+
+	return response;
+};
+
+const unfavoriteMedia = async (id) => {
+	const response = await axios
+		.post(`${baseUrl}/unfavorite/${id}`, null, { withCredentials: true })
+		.catch((error) => {
+			if (error.response) {
+				return { error: error.response.data };
+			} else if (error.request) {
+				console.error(error.request);
+				return {};
+			} else {
+				console.error(error.message);
+				return {};
+			}
+		});
+
+	return response;
+};
+
+const findAllFavoritedMedias = async () => {
+	const response = await axios
+		.get(`${baseUrl}/favoritedMedias/get`)
+		.then((response) => {
+			return response.data;
+		})
+		.catch((error) => {
+			if (error.response) {
+				return { error: error.response.data };
+			} else if (error.request) {
+				console.error(error.request);
+				return {};
+			} else {
+				console.error(error.message);
+				return {};
+			}
+		});
+
+	return response;
+};
+
 export default {
 	createMedia,
 	updateMedia,
@@ -105,4 +163,7 @@ export default {
 	findAllMedias,
 	findOneMedia,
 	uploadMediaPoster,
+	favoriteMedia,
+	unfavoriteMedia,
+	findAllFavoritedMedias,
 };

@@ -1,4 +1,4 @@
-import { Button, Col, Container, Form, Modal, Row } from "react-bootstrap";
+import { Button, Col, Container, Form, Modal, ProgressBar, Row } from "react-bootstrap";
 import "../../styles/Modal/ModalContent.css";
 import styles from "../../styles/Modal/MediaReviewModal.module.css";
 import { useEffect, useState } from "react";
@@ -7,14 +7,19 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import ReactStars from "react-rating-stars-component";
 import ReviewService from "../../api/ReviewService";
+import CommentProgress from "../ProgressBar/CommentProgress";
 
 const ReviewModal = (props) => {
 	const [media, setMedia] = useState(null);
 	const review = props.review;
 	const [rating, setRating] = useState(review ? review.mediaScore : 0);
+	const [commentProgress, setCommentProgress] = useState(review ? review.comment.length : 0);
 
 	const schema = yup.object({
-		comment: yup.string().required("Por favor, digite a sua análise"),
+		comment: yup
+			.string()
+			.max(255, "A análise deve ter até 255 caracteres")
+			.required("Por favor, digite a sua análise"),
 	});
 
 	const form = useForm({
@@ -29,8 +34,8 @@ const ReviewModal = (props) => {
 
 	const closeModal = () => {
 		reset();
-
 		setRating(review ? review.mediaScore : 0);
+		setCommentProgress(review ? review.comment.length : 0);
 		props.onHide();
 	};
 
@@ -124,10 +129,20 @@ const ReviewModal = (props) => {
 											errors.comment ? "is-invalid" : ""
 										} ${errors.comment && styles.textAreaError}`}
 										placeholder="Digite a sua análise"
+										onChange={(e) => {
+											setCommentProgress(e.target.value.length);
+										}}
 									/>
 
 									<div className={`invalid-feedback ${styles.error}`}>
 										{errors.comment && <span>{errors.comment.message}</span>}
+									</div>
+
+									<div className="mt-2">
+										<CommentProgress
+											actualProgress={commentProgress}
+											maxValue={255}
+										/>
 									</div>
 								</Form.Group>
 

@@ -40,6 +40,23 @@ router.get(
 	}
 );
 
+router.get("/favoritedMedias/get", async (req, res) => {
+	const result = validationResult(req).formatWith(errorsFormatter);
+	try {
+		result.throw();
+
+		const medias = await mediaController.findUsersFavoriteMedias();
+
+		res.status(200).json(medias);
+	} catch (error) {
+		console.log(error);
+		res.status(400).json({
+			codigoErro: "ERRO_CAMPOS_INVALIDOS",
+			dadosErro: error.mapped(),
+		});
+	}
+});
+
 router.post(
 	"/",
 	verifyToken,
@@ -81,6 +98,54 @@ router.post(
 		try {
 			result.throw();
 			mediaController.addMedia(req, res);
+		} catch (error) {
+			res.status(400).json({
+				codigoErro: "ERRO_CAMPOS_INVALIDOS",
+				dadosErro: error.mapped(),
+			});
+		}
+	}
+);
+
+router.post(
+	"/favorite/:mediaId",
+	verifyToken,
+	check("mediaId")
+		.exists()
+		.withMessage("ID não pode ser nulo!")
+		.isInt()
+		.withMessage("ID deve ser um número inteiro!")
+		.custom((id) => id > 0)
+		.withMessage("ID não pode ser negativo!"),
+	async (req, res) => {
+		const result = validationResult(req).formatWith(errorsFormatter);
+		try {
+			result.throw();
+			mediaController.favoriteMedia(req, res);
+		} catch (error) {
+			res.status(400).json({
+				codigoErro: "ERRO_CAMPOS_INVALIDOS",
+				dadosErro: error.mapped(),
+			});
+		}
+	}
+);
+
+router.post(
+	"/unfavorite/:mediaId",
+	verifyToken,
+	check("mediaId")
+		.exists()
+		.withMessage("ID não pode ser nulo!")
+		.isInt()
+		.withMessage("ID deve ser um número inteiro!")
+		.custom((id) => id > 0)
+		.withMessage("ID não pode ser negativo!"),
+	async (req, res) => {
+		const result = validationResult(req).formatWith(errorsFormatter);
+		try {
+			result.throw();
+			mediaController.unfavoriteMedia(req, res);
 		} catch (error) {
 			res.status(400).json({
 				codigoErro: "ERRO_CAMPOS_INVALIDOS",

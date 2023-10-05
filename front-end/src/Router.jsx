@@ -14,6 +14,7 @@ import EditUserPasswordPage from "./pages/User/EditUserPasswordPage";
 import MediaReviewsPage from "./pages/Review/MediaReviewsPage";
 
 import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
+import FavoritesMedias from "./pages/Media/FavoritesMedias";
 
 const Router = createBrowserRouter([
 	{
@@ -30,6 +31,7 @@ const Router = createBrowserRouter([
 						path: "register",
 						element: <CreateAccountPage />,
 					},
+
 					{
 						path: "edit/:id",
 						children: [
@@ -108,6 +110,10 @@ const Router = createBrowserRouter([
 							if (!users) return [];
 							return users;
 						},
+					},
+					{
+						path: "favoritesMedias",
+						element: <FavoritesMedias />,
 					},
 				],
 			},

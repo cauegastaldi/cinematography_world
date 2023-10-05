@@ -5,15 +5,22 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import ReviewService from "../../api/ReviewService";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import CommentProgress from "../ProgressBar/CommentProgress";
 
 const ReviewCommentModal = (props) => {
 	const reviewComment = props.reviewComment;
 	const review = props.review;
 	const reviewUser = props.reviewUser;
+	const [commentProgress, setCommentProgress] = useState(
+		reviewComment ? reviewComment.comment.length : 0
+	);
 
 	const schema = yup.object({
-		comment: yup.string().required("Por favor, digite o seu comentário"),
+		comment: yup
+			.string()
+			.max(255, "O comentário deve ter até 255 caracteres")
+			.required("Por favor, digite o seu comentário"),
 	});
 
 	const form = useForm({
@@ -28,13 +35,10 @@ const ReviewCommentModal = (props) => {
 
 	const closeModal = () => {
 		reset();
-
+		setCommentProgress(reviewComment ? reviewComment.comment.length : 0);
 		props.onHide();
 	};
 
-	useEffect(() => {
-		console.log(reviewComment);
-	});
 	const onSubmit = async (data) => {
 		const comment = data.comment;
 
@@ -124,10 +128,20 @@ const ReviewCommentModal = (props) => {
 											errors.comment ? "is-invalid" : ""
 										} ${errors.comment && styles.textAreaError}`}
 										placeholder="Digite o seu comentário"
+										onChange={(e) => {
+											setCommentProgress(e.target.value.length);
+										}}
 									/>
 
 									<div className={`invalid-feedback ${styles.error}`}>
 										{errors.comment && <span>{errors.comment.message}</span>}
+									</div>
+
+									<div className="mt-2">
+										<CommentProgress
+											actualProgress={commentProgress}
+											maxValue={255}
+										/>
 									</div>
 								</Form.Group>
 							</Col>

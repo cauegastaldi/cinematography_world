@@ -57,8 +57,8 @@ const ReviewComment = ({
 							</Card.Subtitle>
 
 							<Card.Subtitle className={`mx-2 mb-2 fw-normal`}>
-								{reviewComment.likes === 1 && <small>{likes} curtida</small>}
-								{reviewComment.likes !== 1 && <small>{likes} curtidas</small>}
+								{likes === 1 && <small>{likes} curtida</small>}
+								{likes !== 1 && <small>{likes} curtidas</small>}
 							</Card.Subtitle>
 						</div>
 

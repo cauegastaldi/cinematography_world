@@ -29,11 +29,13 @@ async function login(req, res) {
 
 	const token = jwt.sign({ userId: user.id, username, userType: user.userType }, privateKey, {
 		algorithm: "RS256",
+		expiresIn: "1d",
 	});
 
 	res.cookie("token", token, {
 		secure: false,
 		httpOnly: true,
+		expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 1),
 	});
 	res.status(200).json({ userId: user.id, username: user.username, userType: user.userType });
 }

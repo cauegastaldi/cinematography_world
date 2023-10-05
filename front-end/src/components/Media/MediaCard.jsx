@@ -7,7 +7,7 @@ import styles from "../../styles/HomePage/MediaCard.module.css";
 import modalStyles from "../../styles/HomePage/RemoveModal.module.css";
 import "../../styles/Modal/ModalContent.css";
 
-const MediaCard = ({ media, userType, loadData }) => {
+const MediaCard = ({ media, userType, loadData, isFavoriteCard = false }) => {
 	const [open, setOpen] = useState(false);
 	const [show, setShow] = useState(false);
 
@@ -35,39 +35,41 @@ const MediaCard = ({ media, userType, loadData }) => {
 					}}
 				/>
 
-				<Card.ImgOverlay style={{ pointerEvents: "none" }}>
-					{userType === "ADMIN" && (
-						<Fade
-							in={open}
-							timeout={0.3}
-						>
-							<div
-								id="buttons"
-								style={{ color: "white" }}
-								className="mx-auto"
+				{!isFavoriteCard && (
+					<Card.ImgOverlay style={{ pointerEvents: "none" }}>
+						{userType === "ADMIN" && (
+							<Fade
+								in={open}
+								timeout={0.3}
 							>
-								<ButtonGroup vertical>
-									<button
-										className={`btn ${styles.btn} btn-primary text-uppercase fw-bold rounded-3 mb-2`}
-										style={{ pointerEvents: "auto" }}
-										onClick={() => {
-											navigate(`/media/edit/${media.id}`);
-										}}
-									>
-										Editar
-									</button>
-									<button
-										className={`btn ${styles.btn} btn-danger text-uppercase fw-bold rounded-3`}
-										style={{ pointerEvents: "auto" }}
-										onClick={() => handleShow()}
-									>
-										Excluir
-									</button>
-								</ButtonGroup>
-							</div>
-						</Fade>
-					)}
-				</Card.ImgOverlay>
+								<div
+									id="buttons"
+									style={{ color: "white" }}
+									className="mx-auto"
+								>
+									<ButtonGroup vertical>
+										<button
+											className={`btn ${styles.btn} btn-primary text-uppercase fw-bold rounded-3 mb-2`}
+											style={{ pointerEvents: "auto" }}
+											onClick={() => {
+												navigate(`/media/edit/${media.id}`);
+											}}
+										>
+											Editar
+										</button>
+										<button
+											className={`btn ${styles.btn} btn-danger text-uppercase fw-bold rounded-3`}
+											style={{ pointerEvents: "auto" }}
+											onClick={() => handleShow()}
+										>
+											Excluir
+										</button>
+									</ButtonGroup>
+								</div>
+							</Fade>
+						)}
+					</Card.ImgOverlay>
+				)}
 			</Card>
 
 			<Modal

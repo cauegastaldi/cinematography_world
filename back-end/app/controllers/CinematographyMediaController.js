@@ -1,6 +1,9 @@
 import { resolve } from "path";
 import Media from "../modules/CinematographyMedia";
 import fs from "fs";
+import UserController from "./UserController";
+import UsersFavoriteMedias from "../modules/UserFavoriteMedias";
+import User from "../modules/User";
 
 async function findAll(req, res) {
 	let result = await Media.findAll();
@@ -54,7 +57,7 @@ async function updateMedia(req, res) {
 	const genre = req.body.genre;
 	const director = req.body.director;
 	const posterPath = req.body.posterPath;
-	const trailerUrl = req.body.trailerUrl.trim();
+	const trailerUrl = req.body.trailerUrl?.trim();
 
 	if (name != null) media.name = name;
 
@@ -108,4 +111,118 @@ async function deleteMedia(req, res) {
 	return res.status(200).send({ msg: "Mídia deletada com sucesso!" });
 }
 
-export default { findAll, findMediaById, addMedia, updateMedia, deleteMedia };
+async function favoriteMedia(req, res) {
+	const mediaId = req.params.mediaId;
+	const media = await findMediaById(mediaId);
+	const userId = req.userId;
+	const user = await UserController.findUserById(userId);
+
+	if (media == null && user == null) {
+		return res.status(400).json({
+			errorCode: "ERRO_MIDIA_E_USUARIO_NAO_EXISTENTES",
+			errorData: `Mídia e usuário não existentes! Por favor, informe uma mídia e usuário existentes.`,
+		});
+	} else if (media == null && user != null) {
+		return res.status(400).json({
+			errorCode: "ERRO_MIDIA_NAO_EXISTENTE",
+			errorData: `Mídia não existente! Por favor, informe uma mídia existente.`,
+		});
+	} else if (user == null) {
+		return res.status(400).json({
+			errorCode: "ERRO_USUARIO_NAO_EXISTENTE",
+			errorData: `Usuário não existente! Por favor, informe um usuário existente.`,
+		});
+	}
+
+	const userFavoriteMedia = await UsersFavoriteMedias.findOne({
+		where: {
+			mediaId: mediaId,
+			userId: user.id,
+		},
+	});
+
+	if (userFavoriteMedia !== null) {
+		return res.status(400).json({
+			errorCode: "ERRO_MIDIA_JA_FAVORITADA",
+			errorData: `Mídia já favoritada!`,
+		});
+	}
+
+	/*await UsersFavoriteMedias.create({
+		userId: userId,
+		mediaId: mediaId,
+	});*/
+
+	await media.addUsersWhoLiked(user);
+
+	return res.status(200).send({ msg: "Mídia favoritada com sucesso!" });
+}
+
+async function unfavoriteMedia(req, res) {
+	const mediaId = req.params.mediaId;
+	const media = await findMediaById(mediaId);
+	const userId = req.userId;
+	const user = await UserController.findUserById(userId);
+
+	if (media == null && user == null) {
+		return res.status(400).json({
+			errorCode: "ERRO_MIDIA_E_USUARIO_NAO_EXISTENTES",
+			errorData: `Mídia e usuário não existentes! Por favor, informe uma mídia e usuário existentes.`,
+		});
+	} else if (media == null && user != null) {
+		return res.status(400).json({
+			errorCode: "ERRO_MIDIA_NAO_EXISTENTE",
+			errorData: `Mídia não existente! Por favor, informe uma mídia existente.`,
+		});
+	} else if (user == null) {
+		return res.status(400).json({
+			errorCode: "ERRO_USUARIO_NAO_EXISTENTE",
+			errorData: `Usuário não existente! Por favor, informe um usuário existente.`,
+		});
+	}
+
+	const userFavoriteMedia = await UsersFavoriteMedias.findOne({
+		where: {
+			mediaId: mediaId,
+			userId: user.id,
+		},
+	});
+
+	if (userFavoriteMedia === null) {
+		return res.status(400).json({
+			errorCode: "ERRO_MIDIA_NAO_FAVORITADA",
+			errorData: `Usuário não favoritou a mídia especificada!`,
+		});
+	}
+
+	await userFavoriteMedia.destroy();
+
+	return res.status(200).send({ msg: "Mídia desfavoritada com sucesso!" });
+}
+
+async function findUsersFavoriteMedias() {
+	let result = await Media.findAll({
+		include: { model: User, as: "usersWhoLiked", attributes: ["id", "username"] },
+	});
+
+	result = result.map((favoriteMedia) => {
+		return favoriteMedia.dataValues;
+	});
+
+	result = result.filter((favoriteMedia) => {
+		return favoriteMedia.usersWhoLiked.length > 0;
+	});
+
+	return result;
+}
+
+export default {
+	findAll,
+	findMediaById,
+	addMedia,
+	updateMedia,
+	deleteMedia,
+	favoriteMedia,
+	unfavoriteMedia,
+	findUsersFavoriteMedias,
+};

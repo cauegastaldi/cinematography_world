@@ -10,16 +10,18 @@ const HomePage = () => {
 	const userType = auth.user?.userType;
 	const [medias, setMedias] = useState([]);
 
-	const loadData = () => {
-		MediaService.findAllMedias(setMedias);
+	const loadData = async () => {
+		console.log(await MediaService.findAllMedias());
+		setMedias(await MediaService.findAllMedias());
 	};
 
-	const searchMedia = (mediaName) => {
+	const searchMedia = async (mediaName) => {
 		if (mediaName === "") {
 			loadData();
 		} else {
 			const regex = new RegExp(`^${mediaName}`);
 
+			const medias = await MediaService.findAllMedias();
 			const foundMedias = medias.filter((media) => {
 				return regex.test(media.name.toLowerCase());
 			});

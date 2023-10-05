@@ -5,10 +5,12 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { useNavigate } from "react-router-dom";
 import MediaService from "../../api/MediaService";
 import FileValidator from "../../utils/FileValidator";
+import ImageResizer from "../../utils/ImageResizer";
 import { useState } from "react";
 
 const CreateMediaPage = () => {
 	const [acceptedTypes] = useState(FileValidator.acceptedTypes);
+	const [image, setImage] = useState(null);
 
 	const schema = yup.object({
 		name: yup.string().required("Por favor, insira um nome"),
@@ -53,7 +55,8 @@ const CreateMediaPage = () => {
 
 	const onSubmit = async (data) => {
 		const formData = new FormData();
-		formData.append("mediaPoster", data.mediaPoster[0]);
+		const image = await ImageResizer.resizeImage(data.mediaPoster[0]);
+		formData.append("mediaPoster", image);
 		const uploadResponse = await MediaService.uploadMediaPoster(formData);
 		if (uploadResponse.errors) {
 			setError("createMedia", { message: uploadResponse.errors.payload });

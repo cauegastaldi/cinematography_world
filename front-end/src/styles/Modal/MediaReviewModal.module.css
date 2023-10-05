@@ -54,9 +54,10 @@
 
 .textAreaError {
 	box-shadow: none !important;
+	background-image: none !important;
 }
 
 .error {
-	width: 15em;
+	width: 20em;
 	color: #cf6679;
 }
