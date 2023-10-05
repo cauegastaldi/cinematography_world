@@ -11,15 +11,6 @@ import ReactPlayer from "react-player";
 import MediaService from "../../api/MediaService";
 
 const renderTooltip = (props) => (
-	/*
-	<Tooltip
-		id="button-tooltip"
-		className={styles.tooltip}
-		{...props}
-	>
-		Favoritar
-	</Tooltip>*/
-
 	<div
 		{...props}
 		className={styles.tooltip}
@@ -165,7 +156,7 @@ const MediaReviewsPage = () => {
 
 							{userFavoritedMedia && (
 								<OverlayTrigger
-									overlay={renderTooltip({ text: "Desfazer favoritar" })}
+									overlay={renderTooltip({ text: "Desfazer Favoritar" })}
 									rootClose={true}
 									delay={{ show: 500, hide: 0 }}
 									placement="bottom"

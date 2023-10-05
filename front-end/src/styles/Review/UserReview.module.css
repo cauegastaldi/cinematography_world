@@ -54,3 +54,7 @@
 .commentsContainer {
 	padding-left: 5.5em;
 }
+
+.commentsNumber {
+	font-family: "Lato", sans-serif;
+}

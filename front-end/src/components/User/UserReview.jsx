@@ -142,7 +142,10 @@ const UserReview = ({ review, media, loadData }) => {
 								setCommentsOpen(true);
 							}}
 						>
-							<i className="bi bi-chat"></i> Comentários ({reviewComments?.length})
+							<i className="bi bi-chat"></i> Comentários{" "}
+							<span className={styles.commentsNumber}>
+								({reviewComments?.length})
+							</span>
 						</Card.Link>
 					)}
 					{openComments && (
@@ -153,8 +156,10 @@ const UserReview = ({ review, media, loadData }) => {
 									setCommentsOpen(false);
 								}}
 							>
-								<i className="bi bi-chat"></i> Comentários ({reviewComments?.length}
-								)
+								<i className="bi bi-chat"></i> Comentários{" "}
+								<span className={styles.commentsNumber}>
+									({reviewComments?.length})
+								</span>
 							</Card.Link>
 						</>
 					)}
