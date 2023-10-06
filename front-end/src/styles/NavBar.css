@@ -21,3 +21,11 @@
 .active {
 	color: #f8f8f8 !important;
 }
+
+.link:focus-visible,
+#dropdown:focus-visible {
+	color: #f8f8f8 !important;
+	box-shadow: none !important;
+	border: 2px solid white !important;
+	border-radius: 5px !important;
+}

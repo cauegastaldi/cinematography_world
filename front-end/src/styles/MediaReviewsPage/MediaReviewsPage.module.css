@@ -61,6 +61,14 @@ p.mediaDetail {
 	background-color: transparent;
 }
 
+.favoriteBtn:focus-visible {
+	background-color: #f9188141 !important;
+	color: #f91880 !important;
+	box-shadow: none !important;
+	border-color: transparent !important;
+	border-radius: 100% !important;
+}
+
 .favoriteBtn.favoritedMediaBtn,
 .favoriteBtn:active:focus.favoritedMediaBtn {
 	color: #f91880;
