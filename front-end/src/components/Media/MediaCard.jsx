@@ -90,7 +90,7 @@ const MediaCard = ({ media, userType, loadData, isFavoriteCard = false }) => {
 						></button>
 					</Modal.Header>
 					<Modal.Body className={modalStyles.modalBody}>
-						Tem certeza de que deseja excluir a midia? A ação não poderá ser desfeita!
+						Tem certeza de que deseja excluir a mídia? A ação não poderá ser desfeita!
 					</Modal.Body>
 					<Modal.Footer className={modalStyles.modalFooter}>
 						<Button
