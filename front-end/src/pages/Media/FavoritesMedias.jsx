@@ -27,7 +27,7 @@ const FavoritesMedias = () => {
 
 	const searchMedia = async (mediaName) => {
 		if (mediaName === "") {
-			loadData();
+			setFavoritesMedias(originalMedias);
 		} else {
 			const regex = new RegExp(`^${mediaName}`);
 
