@@ -11,7 +11,6 @@ const HomePage = () => {
 	const [medias, setMedias] = useState([]);
 
 	const loadData = async () => {
-		console.log(await MediaService.findAllMedias());
 		setMedias(await MediaService.findAllMedias());
 	};
 

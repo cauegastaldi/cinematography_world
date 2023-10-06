@@ -1,7 +1,7 @@
 import { createBrowserRouter } from "react-router-dom";
 import LoginPage from "./pages/LoginPage";
 import Layout from "./layouts/Layout";
-import CreateAccountPage from "./pages/CreateAccountPage";
+import CreateAccountPage from "./pages/User/CreateAccountPage";
 import CreateMediaPage from "./pages/Media/CreateMediaPage";
 import ListUsersPage from "./pages/User/ListUsersPage";
 import HomePage from "./pages/HomePage";

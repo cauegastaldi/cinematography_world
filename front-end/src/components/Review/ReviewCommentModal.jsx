@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import ReviewService from "../../api/ReviewService";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import CommentProgress from "../ProgressBar/CommentProgress";
 
 const ReviewCommentModal = (props) => {
@@ -56,8 +56,12 @@ const ReviewCommentModal = (props) => {
 			if (response.errors) {
 				setError("responseFeedback", { message: response.errors.errorData });
 			} else {
-				props.loadData();
-				closeModal();
+				if (reviewComment) {
+					window.location.reload();
+				} else {
+					props.loadData();
+					closeModal();
+				}
 			}
 		} catch (error) {
 			console.log(error);

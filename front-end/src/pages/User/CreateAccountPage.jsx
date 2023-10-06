@@ -1,11 +1,11 @@
-import "../styles/Form.css";
+import "../../styles/Form.css";
 import * as yup from "yup";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
-import { useAuth } from "../hooks/useAuth";
-import UserService from "../api/UserService";
+import { useAuth } from "../../hooks/useAuth";
+import UserService from "../../api/UserService";
 
 const CreateAccountPage = () => {
 	const auth = useAuth();

@@ -60,8 +60,12 @@ const ReviewModal = (props) => {
 			if (response.errors) {
 				setError("responseFeedback", { message: response.errors.errorData });
 			} else {
-				props.loadData();
-				closeModal();
+				if (review) {
+					window.location.reload();
+				} else {
+					props.loadData();
+					closeModal();
+				}
 			}
 		} catch (error) {
 			console.log(error);
