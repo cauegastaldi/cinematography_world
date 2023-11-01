@@ -15,6 +15,7 @@ import MediaReviewsPage from "./pages/Review/MediaReviewsPage";
 
 import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
 import FavoritesMedias from "./pages/Media/FavoritesMedias";
+import EditUserImagePage from "./pages/User/EditUserImagePage";
 
 const Router = createBrowserRouter([
 	{
@@ -51,6 +52,17 @@ const Router = createBrowserRouter([
 								element: (
 									<ProtectedRoute>
 										<EditUserPasswordPage />
+									</ProtectedRoute>
+								),
+								loader: async ({ params }) => {
+									return await UserService.findUserById(params.id);
+								},
+							},
+							{
+								path: "userImage",
+								element: (
+									<ProtectedRoute>
+										<EditUserImagePage />
 									</ProtectedRoute>
 								),
 								loader: async ({ params }) => {

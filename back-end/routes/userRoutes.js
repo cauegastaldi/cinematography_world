@@ -141,7 +141,6 @@ router.post(
 		.trim()
 		.notEmpty()
 		.withMessage("Senha não pode ser vazia!"),
-
 	async (req, res) => {
 		const result = validationResult(req).formatWith(errorsFormatter);
 		try {
@@ -166,7 +165,6 @@ router.put(
 		.notEmpty()
 		.withMessage("Nome de usuário não pode ser vazio!"),
 	check("password").optional().trim().notEmpty().withMessage("Senha não pode ser vazia!"),
-
 	async (req, res) => {
 		const result = validationResult(req).formatWith(errorsFormatter);
 		try {

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Card } from "react-bootstrap";
+import { Card, Image } from "react-bootstrap";
 import styles from "../../styles/Review/UserReview.module.css";
 import UserService from "../../api/UserService";
 import ReactStars from "react-rating-stars-component";
@@ -21,8 +21,11 @@ const UserReview = ({ review, media, loadData }) => {
 
 	const findUser = async () => {
 		const reviewUser = await UserService.findUserById(review.userId);
-
-		setReviewUser({ id: reviewUser.id, username: reviewUser.username });
+		setReviewUser({
+			id: reviewUser.id,
+			username: reviewUser.username,
+			imagePath: `http://localhost:8000${reviewUser.imagePath}`,
+		});
 	};
 
 	const findReviewComments = async () => {
@@ -79,6 +82,11 @@ const UserReview = ({ review, media, loadData }) => {
 				<Card.Body className={styles.body}>
 					<div>
 						<div className={styles.userDetails}>
+							<Image
+								rounded
+								src={reviewUser?.imagePath}
+								className={styles.userImage}
+							/>
 							<Card.Subtitle className={`mb-2`}>{reviewUser?.username}</Card.Subtitle>
 							<Card.Subtitle className={`mx-2 mb-2`}>
 								<ReactStars

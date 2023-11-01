@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const baseUrl = "http://localhost:8000/medias";
-const uploadUrl = "http://localhost:8000/upload";
+const uploadUrl = "http://localhost:8000/upload/uploadPoster";
 
 const createMedia = async (data) => {
 	const response = axios

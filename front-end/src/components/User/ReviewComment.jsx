@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import styles from "../../styles/Review/UserReview.module.css";
-import { Card } from "react-bootstrap";
+import { Card, Image } from "react-bootstrap";
 import ReviewService from "../../api/ReviewService";
 import ReviewCommentModal from "../Review/ReviewCommentModal";
 
@@ -52,6 +52,11 @@ const ReviewComment = ({
 				<Card.Body className={styles.body}>
 					<div>
 						<div className={styles.userDetails}>
+							<Image
+								rounded
+								src={`http://localhost:8000${reviewComment.user?.imagePath}`}
+								className={styles.userImage}
+							/>
 							<Card.Subtitle className={`mb-2`}>
 								{reviewComment.user?.username}
 							</Card.Subtitle>

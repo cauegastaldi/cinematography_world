@@ -29,6 +29,10 @@ const User = db.define("user", {
 			},
 		},
 	},
+	imagePath: {
+		type: Sequelize.STRING,
+		allowNull: false,
+	},
 });
 
 User.hasMany(Review, {

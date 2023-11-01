@@ -1,4 +1,4 @@
-import { Button, Modal, Nav, NavDropdown, Navbar } from "react-bootstrap";
+import { Button, Image, Modal, Nav, NavDropdown, Navbar } from "react-bootstrap";
 import { Container } from "react-bootstrap";
 import AuthService from "../api/AuthService";
 
@@ -73,8 +73,22 @@ const NavBar = () => {
 								title="Meu Perfil"
 								menuVariant="dark"
 							>
+								<NavDropdown.Item id="usernameNavbar">
+									<Image
+										src={`http://localhost:8000${user?.userImage}`}
+										roundedCircle
+										width="35px"
+										height="35px"
+										style={{ marginRight: "0.5em" }}
+									/>
+									{user?.username}
+								</NavDropdown.Item>
 								<LinkContainer to={`/user/edit/${user?.userId}/username`}>
 									<NavDropdown.Item>Alterar Username</NavDropdown.Item>
+								</LinkContainer>
+
+								<LinkContainer to={`/user/edit/${user?.userId}/userImage`}>
+									<NavDropdown.Item>Alterar Imagem de Perfil</NavDropdown.Item>
 								</LinkContainer>
 
 								<LinkContainer to={`/user/edit/${user?.userId}/password`}>

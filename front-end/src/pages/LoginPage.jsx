@@ -36,6 +36,7 @@ const LoginPage = () => {
 					userId: response.userId,
 					username: response.username,
 					userType: response.userType,
+					userImage: response.userImage,
 				});
 				navigate("/");
 			}

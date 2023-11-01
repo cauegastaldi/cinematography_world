@@ -6,6 +6,8 @@ import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { useAuth } from "../../hooks/useAuth";
 import UserService from "../../api/UserService";
+import FileValidator from "../../utils/FileValidator";
+import ImageResizer from "../../utils/ImageResizer";
 
 const CreateAccountPage = () => {
 	const auth = useAuth();
@@ -14,6 +16,19 @@ const CreateAccountPage = () => {
 	const schema = yup.object({
 		username: yup.string().required("Por favor, insira um username"),
 		password: yup.string().required("Por favor, insira uma senha"),
+		userImage: yup
+			.mixed()
+			.optional()
+			.test("is-valid-type", "Por favor, envie uma imagem com um tipo válido", (file) => {
+				if (file.length > 0) {
+					return FileValidator.isValidFileType(
+						file && file[0].name.toLowerCase(),
+						"image"
+					);
+				} else {
+					return true;
+				}
+			}),
 	});
 
 	const form = useForm({
@@ -28,16 +43,36 @@ const CreateAccountPage = () => {
 	const onSubmit = async (data) => {
 		const username = data.username;
 		const password = data.password;
+		console.log(!data.userImage[0]);
 		try {
 			const response = await UserService.findUserByName(username);
 			if (!response.errors) {
 				setError("createAccount", { message: "Username já está sendo utilizado" });
 			} else {
+				let uploadResponse = null;
+				if (data.userImage[0]) {
+					const formData = new FormData();
+					const image = await ImageResizer.resizeImage(data.userImage[0]);
+					formData.append("userImage", image);
+					uploadResponse = await UserService.uploadUserImage(formData);
+					if (uploadResponse.errors) {
+						setError("createAccount", { message: uploadResponse.errors.payload });
+						return;
+					}
+				}
 				if (userType !== "ADMIN") {
-					await UserService.createNormalUser({ username: username, password: password });
+					await UserService.createNormalUser({
+						username: username,
+						password: password,
+						imagePath: uploadResponse,
+					});
 					navigate("/login");
 				} else {
-					await UserService.createAdminUser({ username: username, password: password });
+					await UserService.createAdminUser({
+						username: username,
+						password: password,
+						imagePath: uploadResponse,
+					});
 					navigate("/");
 				}
 			}
@@ -63,7 +98,6 @@ const CreateAccountPage = () => {
 								{userType !== "ADMIN" && <span>Criar Conta</span>}
 								{userType === "ADMIN" && <span>Criar Administrador</span>}
 							</h5>
-
 							{errors.createAccount && (
 								<div className="card text-white bg-dark shadow rounded-1 my-4">
 									<div className="card-body p-3">
@@ -110,6 +144,32 @@ const CreateAccountPage = () => {
 									<label for="password">Senha</label>
 									<div className="invalid-feedback">
 										{errors.password && <span>{errors.password.message}</span>}
+									</div>
+								</div>
+
+								<div className="mb-3">
+									<label
+										for="mediaPoster"
+										className="form-label ps-1"
+									>
+										Imagem de Perfil (Opcional)
+									</label>
+									<input
+										{...register("userImage")}
+										required
+										type="file"
+										className={`form-control ${
+											errors.userImage ? "is-invalid" : ""
+										}`}
+										id="userImage"
+										name="userImage"
+										placeholder="userImage"
+									/>
+
+									<div className="invalid-feedback">
+										{errors.userImage && (
+											<span>{errors.userImage.message}</span>
+										)}
 									</div>
 								</div>
 

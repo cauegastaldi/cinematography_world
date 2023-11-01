@@ -1,7 +1,12 @@
+import fs from "fs";
 import Review from "../modules/Review";
 import User from "../modules/User";
 import passwordUtils from "../utils/User/passwordUtils";
 import sequelize from "../../database/db";
+import { resolve } from "path";
+
+const DEFAULT_IMAGE_PATH = "/defaultImage/defaultUserImage.png";
+
 async function findAll(req, res) {
 	let result = await User.findAll();
 	result = result.map((user) => {
@@ -30,6 +35,7 @@ async function findUserByUsername(username) {
 async function addUser(req, res) {
 	const username = req.body.username;
 	const userType = req.body.userType;
+	let imagePath = req.body.imagePath;
 
 	if (userType == "ADMIN" && req.userType != "ADMIN") {
 		return res.status(403).json({
@@ -49,10 +55,15 @@ async function addUser(req, res) {
 
 	const password = await passwordUtils.hashPassword(req.body.password);
 
+	if (imagePath == null) {
+		imagePath = DEFAULT_IMAGE_PATH;
+	}
+
 	User.create({
 		username: username,
 		password: password,
 		userType: userType,
+		imagePath: imagePath,
 	}).then((result) => res.status(200).json(result));
 }
 
@@ -72,6 +83,7 @@ async function updateUser(req, res) {
 
 	const username = req.body.username;
 	let password = req.body.password;
+	const imagePath = req.body.imagePath;
 
 	if (username != null) {
 		if (user.username !== username) {
@@ -89,6 +101,19 @@ async function updateUser(req, res) {
 	if (password != null) {
 		user.password = await passwordUtils.hashPassword(req.body.password);
 	}
+	if (imagePath != null) {
+		if (user.imagePath != DEFAULT_IMAGE_PATH) {
+			// exclui a imagem antiga da pasta "/uploads"
+			fs.unlink(resolve(__dirname, `../../public${user.imagePath}`), (err) => {
+				if (err) {
+					console.log(err);
+				}
+			});
+		}
+		user.imagePath = imagePath;
+	} else {
+		user.imagePath = DEFAULT_IMAGE_PATH;
+	}
 
 	await user.save();
 
@@ -105,6 +130,13 @@ async function deleteUser(req, res) {
 		});
 	}
 
+	if (user.username === "caue") {
+		return res.status(401).json({
+			errorCode: "ERRO_NAO_PERMITIDO",
+			errorData: `Não é possível excluir o administrador padrão do sistema.`,
+		});
+	}
+
 	if (req.userType != "ADMIN" && req.userId != user.id) {
 		return res.status(401).json({
 			errorCode: "ERRO_USUARIO_NAO_AUTORIZADO",
@@ -113,6 +145,14 @@ async function deleteUser(req, res) {
 	}
 
 	await user.destroy();
+
+	if (user.imagePath != DEFAULT_IMAGE_PATH) {
+		fs.unlink(resolve(__dirname, `../../public${user.imagePath}`), (err) => {
+			if (err) {
+				console.log(err);
+			}
+		});
+	}
 
 	return res.status(200).send({ msg: "Usuário deletado com sucesso!" });
 }

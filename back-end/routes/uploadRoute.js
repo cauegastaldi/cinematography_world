@@ -1,9 +1,10 @@
 import express from "express";
-import uploadController from "../app/controllers/UploadController";
+import { uploadPosterImage, uploadUserImage } from "../app/controllers/UploadController";
 import verifyToken from "../app/middlewares/verifyToken";
 
 const router = express.Router();
 
-router.post("/", verifyToken, uploadController);
+router.post("/uploadPoster", verifyToken, uploadPosterImage);
+router.post("/uploadUserImage", uploadUserImage);
 
 export default router;

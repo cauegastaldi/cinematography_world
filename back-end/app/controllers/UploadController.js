@@ -18,20 +18,38 @@ const uploadFilter = (req, file, cb) => {
 	}
 };
 
-const uploader = multer({
-	dest: "public/uploads",
+const posterUploader = multer({
+	dest: "public/uploads/posters",
 	fileFilter: uploadFilter,
 	limits: { fileSize: MAX_FILE_SIZE },
 });
 
-export default async (req, res) => {
-	uploader.single("mediaPoster")(req, res, (err) => {
+const userImageUploader = multer({
+	dest: "public/uploads/userImages",
+	fileFilter: uploadFilter,
+});
+
+export const uploadPosterImage = async (req, res) => {
+	posterUploader.single("mediaPoster")(req, res, (err) => {
 		if (err) {
 			res.status(500).json({ error: 1, payload: err });
 		} else {
 			const image = {};
 			image.id = req.file.filename;
-			image.url = `/uploads/${image.id}`;
+			image.url = `/uploads/posters/${image.id}`;
+			res.status(200).json({ error: 0, payload: { id: image.id, url: image.url } });
+		}
+	});
+};
+
+export const uploadUserImage = async (req, res) => {
+	userImageUploader.single("userImage")(req, res, (err) => {
+		if (err) {
+			res.status(500).json({ error: 1, payload: err });
+		} else {
+			const image = {};
+			image.id = req.file.filename;
+			image.url = `/uploads/userImages/${image.id}`;
 			res.status(200).json({ error: 0, payload: { id: image.id, url: image.url } });
 		}
 	});

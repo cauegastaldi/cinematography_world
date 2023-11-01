@@ -37,7 +37,12 @@ async function login(req, res) {
 		httpOnly: true,
 		expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 1),
 	});
-	res.status(200).json({ userId: user.id, username: user.username, userType: user.userType });
+	res.status(200).json({
+		userId: user.id,
+		username: user.username,
+		userType: user.userType,
+		userImage: user.imagePath,
+	});
 }
 
 export default { login };

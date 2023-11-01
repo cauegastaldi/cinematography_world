@@ -69,22 +69,24 @@ const ListUsersPage = () => {
 							<td>{user.username}</td>
 							<td>{(user.userType === "ADMIN" && "Administrador") || "Normal"}</td>
 							<td>
-								<Dropdown>
-									<Dropdown.Toggle
-										as={CustomToggle}
-										id="dropdown-custom-component"
-									/>
+								{user.username !== "caue" && (
+									<Dropdown>
+										<Dropdown.Toggle
+											as={CustomToggle}
+											id="dropdown-custom-component"
+										/>
 
-									<Dropdown.Menu variant="dark">
-										<Dropdown.Item
-											onClick={() => {
-												handleUserDeletion(user.id);
-											}}
-										>
-											<i className="bi bi-trash3 mx-1" /> Excluir
-										</Dropdown.Item>
-									</Dropdown.Menu>
-								</Dropdown>
+										<Dropdown.Menu variant="dark">
+											<Dropdown.Item
+												onClick={() => {
+													handleUserDeletion(user.id);
+												}}
+											>
+												<i className="bi bi-trash3 mx-1" /> Excluir
+											</Dropdown.Item>
+										</Dropdown.Menu>
+									</Dropdown>
+								)}
 							</td>
 						</tr>
 					);

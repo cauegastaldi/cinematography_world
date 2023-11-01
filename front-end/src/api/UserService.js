@@ -1,6 +1,7 @@
 import axios from "axios";
 
 const baseUrl = "http://localhost:8000/users";
+const uploadUrl = "http://localhost:8000/upload/uploadUserImage";
 
 const createNormalUser = async (data) => {
 	const response = axios
@@ -128,6 +129,24 @@ const removeUser = async (id) => {
 	return response;
 };
 
+const uploadUserImage = async (formData) => {
+	const response = axios
+		.post(`${uploadUrl}`, formData, { withCredentials: true })
+		.then((response) => {
+			return `${response.data.payload.url}`;
+		})
+		.catch((error) => {
+			if (error.response) {
+				return { errors: error.response.data };
+			} else if (error.request) {
+				console.error(error.request);
+			} else {
+				console.error(error.message);
+			}
+		});
+	return response;
+};
+
 export default {
 	createNormalUser,
 	createAdminUser,
@@ -137,4 +156,5 @@ export default {
 	findUserById,
 	findUserByName,
 	findMediaReviews,
+	uploadUserImage,
 };

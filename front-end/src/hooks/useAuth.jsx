@@ -24,6 +24,10 @@ export const AuthProvider = ({ children, userData }) => {
 		}
 	};
 
+	const refreshData = async (data) => {
+		setUser({ ...user, ...data });
+	};
+
 	useEffect(() => {
 		isAuthed();
 	}, []);
@@ -33,6 +37,7 @@ export const AuthProvider = ({ children, userData }) => {
 			user,
 			login,
 			logout,
+			refreshData,
 		}),
 		[user]
 	);

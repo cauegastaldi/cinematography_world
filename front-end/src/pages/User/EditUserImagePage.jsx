@@ -6,20 +6,31 @@ import { useLoaderData, useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 import UserService from "../../api/UserService";
 import { useEffect } from "react";
+import FileValidator from "../../utils/FileValidator";
+import ImageResizer from "../../utils/ImageResizer";
 
-const EditUserUsernamePage = () => {
+const EditUserImagePage = () => {
 	const user = useLoaderData();
 	const auth = useAuth();
 	const loggedUser = auth.user;
 
 	const schema = yup.object({
-		username: yup.string().required("Por favor, insira um username"),
+		userImage: yup
+			.mixed()
+			.optional()
+			.test("is-valid-type", "Por favor, envie uma imagem com um tipo válido", (file) => {
+				if (file.length > 0) {
+					return FileValidator.isValidFileType(
+						file && file[0].name.toLowerCase(),
+						"image"
+					);
+				} else {
+					return true;
+				}
+			}),
 	});
 
 	const form = useForm({
-		defaultValues: {
-			username: user ? user.username : "",
-		},
 		resolver: yupResolver(schema),
 	});
 
@@ -29,17 +40,24 @@ const EditUserUsernamePage = () => {
 	const navigate = useNavigate();
 
 	const onSubmit = async (data) => {
-		const username = data.username;
-
 		try {
-			const response = await UserService.findUserByName(username);
-			if (!response.errors) {
-				setError("responseFeedback", { message: "Username já está sendo utilizado" });
-			} else {
-				await UserService.updateUser(user.id, { username: username });
-				await auth.refreshData({ username: username });
-				navigate("/");
+			let uploadResponse = null;
+			if (data.userImage[0]) {
+				const formData = new FormData();
+				const image = await ImageResizer.resizeImage(data.userImage[0]);
+				formData.append("userImage", image);
+				uploadResponse = await UserService.uploadUserImage(formData);
+				if (uploadResponse.errors) {
+					setError("responseFeedback", { message: uploadResponse.errors.payload });
+					return;
+				}
 			}
+
+			await UserService.updateUser(user.id, { imagePath: uploadResponse });
+			await auth.refreshData({
+				userImage: uploadResponse ? uploadResponse : "/defaultImage/defaultUserImage.png",
+			});
+			navigate("/");
 		} catch (error) {
 			console.log(error);
 		}
@@ -57,7 +75,9 @@ const EditUserUsernamePage = () => {
 				<div className="col-sm-9 col-md-7 col-lg-5 mx-auto">
 					<div className="card border-0 shadow rounded-3 my-5">
 						<div className="card-body p-4 p-sm-5">
-							<h5 className="card-title text-center mb-5 ">Editar username</h5>
+							<h5 className="card-title text-center mb-5 ">
+								Editar Imagem de Perfil
+							</h5>
 
 							{errors.responseFeedback && (
 								<div className="card text-white bg-dark shadow rounded-1 my-4">
@@ -76,19 +96,30 @@ const EditUserUsernamePage = () => {
 								onSubmit={handleSubmit(onSubmit)}
 							>
 								<div className="form-floating mb-3">
-									<input
-										{...register("username")}
-										required
-										type="text"
-										className={`form-control ${
-											errors.username ? "is-invalid" : ""
-										}`}
-										id="username"
-										placeholder="username"
-									/>
-									<label for="username">Username</label>
-									<div className="invalid-feedback">
-										{errors.username && <span>{errors.username.message}</span>}
+									<div className="mb-3">
+										<label
+											for="mediaPoster"
+											className="form-label ps-1"
+										>
+											Imagem de Perfil (Opcional)
+										</label>
+										<input
+											{...register("userImage")}
+											required
+											type="file"
+											className={`form-control ${
+												errors.userImage ? "is-invalid" : ""
+											}`}
+											id="userImage"
+											name="userImage"
+											placeholder="userImage"
+										/>
+
+										<div className="invalid-feedback">
+											{errors.userImage && (
+												<span>{errors.userImage.message}</span>
+											)}
+										</div>
 									</div>
 								</div>
 
@@ -119,4 +150,4 @@ const EditUserUsernamePage = () => {
 	);
 };
 
-export default EditUserUsernamePage;
+export default EditUserImagePage;

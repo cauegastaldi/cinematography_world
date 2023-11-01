@@ -29,3 +29,14 @@
 	border: 2px solid white !important;
 	border-radius: 5px !important;
 }
+
+.dropdown-item:hover#usernameNavbar {
+	background-color: transparent;
+	margin: 0 auto;
+	cursor: default;
+}
+
+#usernameNavbar {
+	color: whitesmoke;
+	font-weight: bold;
+}
