@@ -46,7 +46,7 @@ const UserReview = ({ review, media, loadData }) => {
 
 	const handleReviewDeletion = async (id) => {
 		await ReviewService.removeReview(id);
-		loadData();
+		window.location.reload();
 	};
 
 	const handleReviewLike = async (id) => {
@@ -216,7 +216,7 @@ const UserReview = ({ review, media, loadData }) => {
 				}}
 				review={review}
 				reviewUser={reviewUser?.username}
-				loadData={() => findReviewComments()}
+				loadData={() => window.location.reload()}
 			/>
 		</>
 	);

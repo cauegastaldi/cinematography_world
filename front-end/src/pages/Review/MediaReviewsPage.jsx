@@ -134,7 +134,7 @@ const MediaReviewsPage = () => {
 							xs={4}
 							className="mt-auto"
 						>
-							{!userFavoritedMedia && (
+							{user && !userFavoritedMedia && (
 								<OverlayTrigger
 									overlay={renderTooltip({ text: "Favoritar" })}
 									rootClose={true}
@@ -154,7 +154,7 @@ const MediaReviewsPage = () => {
 								</OverlayTrigger>
 							)}
 
-							{userFavoritedMedia && (
+							{user && userFavoritedMedia && (
 								<OverlayTrigger
 									overlay={renderTooltip({ text: "Desfazer Favoritar" })}
 									rootClose={true}
